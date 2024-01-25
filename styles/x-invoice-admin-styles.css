@@ -1,0 +1,24 @@
+#x-invoice-customers-table input {
+    width: 100%;
+  }
+  #x-invoice-customers-table .column-column25 {
+    max-width: 25%;
+  }
+  #x-invoice-customers-table .column-column50 {
+    max-width: 50%;
+  }
+  .reports-btns {
+    display: flex;
+    gap: 0.5em;
+}
+.xi-invoice-info {
+  padding: 0.5em 1em;
+}
+.xi-invoice-info.invoice-info_customer {
+  display: flex;
+  gap: 5em;
+}
+.xi-order-totals {
+  line-height: 2em;
+  padding: 0.5em 1em;
+}

@@ -1,0 +1,253 @@
+@font-face {
+    font-family: 'Yekan';
+    src: url('../assets/Yekan.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'IRANSansFaNum';
+    src: url('../assets/IRANSansFaNum.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body, input, select {
+    font-family: 'IRANSansFaNum', sans-serif !important;
+}
+
+.x-invoice-form-inputs .x_invoice_top_td input,
+.x-invoice-form-inputs .x_invoice_table_td input,
+.x-invoice-form-inputs .x_invoice_top_td select,
+.x-invoice-form-inputs .x_invoice_table_td select {
+	width: 80%;
+}
+
+/* View Invoice Page Start */
+
+.xi-invoice-view-form-controls {
+	display: flex;
+	gap: 1em;
+	flex-direction: column;
+}
+.xi-invoice-view {
+	display: flex;
+	flex-direction: column-reverse;
+	align-items: center;
+}
+.xi-print-invoice {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	gap: 1em;
+}
+
+@media print {
+	.xi-invoice-view-form-controls,
+	header,
+	footer,
+	aside,
+	form {
+		display: none;
+	}
+	.xi-invoice-view {
+		width: 100% !important;
+		padding: 0 !important;
+		margin: 0 !important;
+		font-size: 0.7em;
+	}
+	table.xi-items-list, table.xi-returned-items-list {
+		width: 100%;
+		text-align: center;
+		margin: 0 0 2em 0;
+	}
+	table.xi-items-list,
+	table.xi-items-list th,
+	table.xi-items-list td,
+	table.xi-returned-items-list,
+	table.xi-returned-items-list th,
+	table.xi-returned-items-list td {
+		border: 1px dashed gray;
+		border-collapse: collapse;
+	}
+	.xi-attension {
+		/* outline: 3px red solid; */
+	}
+	p {
+		margin: 0.3em 0;
+	}
+	hr {
+		border-style: dashed;
+	}
+	.xi-invoice-result .xi-final-total {
+		border: 5px solid black;
+		padding: 5px;
+	}
+	.xi-invoice-header {
+		text-align: center;
+	}
+	.xi-invoice-header .company-name, .xi-invoice-header .company-registration-number {
+		font-weight: 700;
+	}
+	.xi-invoice-footer {
+		text-align: center;
+		font-size: 11px;
+	}
+	.xi-invoice-footer table, .xi-pricing {
+		width: 100%;
+		border-collapse: collapse;
+		margin-bottom: 1em;
+	}
+	tr.links td.site {
+		border-left: 1px dashed;
+	}
+	.xi-pricing td.xi-table-prices {
+		text-align: left;
+	}
+	.xi-items-list td, .xi-items-list th, .xi-returned-items-list td, .xi-returned-items-list th, .xi-invoice-footer td {
+		padding: 0.5em 0;
+	}
+	.xi-pricing td {
+		padding: 1em 0;
+	}
+	.xi-pricing tr {
+		border-bottom: 1px dashed;
+		border-top: 1px dashed;
+	}
+	.logo {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-wrap: nowrap;
+	}
+	.xi-invoice-header .logo img {
+		max-width: 100px;
+	}
+	.xi-invoice-header .logo {
+		margin: 1em 0;
+	}
+	.xi-invoice-number {
+		text-align: left;
+	}
+}
+@page {
+	padding: 10mm;
+}
+/* View Invoice Page End */
+
+hr {
+	margin-block-start: 1em;
+	margin-block-end: 1em;
+}
+form#x-invoice {
+	max-width: 1280px;
+}
+.x_invoice_table_td_btn {
+	text-align: center;
+}
+.invoice_total, .invoice_total_returned {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-end;
+	gap: 0.5em;
+}
+.submit-section {
+	display: flex;
+	flex-direction: column;
+}
+/* Payment Method Section*/
+.invoice_options {
+	display: flex;
+	gap: 3em;
+}
+
+.payment_method_section,
+.payment_discount,
+.payment_discount_method,
+.has_discount,
+.payment_tax {
+	display: flex;
+	flex-direction: row;
+	gap: 0.5em;
+}
+.payment_method.payment_cheq {
+	margin-right: 20px;
+}
+
+/* Table Styles*/
+table.clientDataTable {
+	border: 1px solid #1c6ea4;
+	background-color: #eeeeee;
+	width: 100%;
+	text-align: center;
+	border-collapse: collapse;
+}
+table.clientDataTable td,
+table.clientDataTable th {
+	border: 1px solid #aaaaaa;
+	padding: 3px 2px;
+}
+table.clientDataTable tbody td {
+	font-size: 16px;
+}
+table.clientDataTable tr:nth-child(even) {
+	background: #d0e4f5;
+}
+table.clientDataTable thead {
+	background: #1c6ea4;
+	background: -moz-linear-gradient(top, #5592bb 0%, #327cad 66%, #1c6ea4 100%);
+	background: -webkit-linear-gradient(top, #5592bb 0%, #327cad 66%, #1c6ea4 100%);
+	background: linear-gradient(to bottom, #5592bb 0%, #327cad 66%, #1c6ea4 100%);
+	border-bottom: 2px solid #444444;
+}
+table.clientDataTable thead th {
+	font-size: 18px;
+	font-weight: bold;
+	color: #ffffff;
+	border-left: 2px solid #d0e4f5;
+}
+table.clientDataTable thead th:first-child {
+	border-left: none;
+}
+
+table.clientDataTable tfoot td {
+	font-size: 14px;
+}
+table.clientDataTable tfoot .links {
+	text-align: right;
+}
+table.clientDataTable tfoot .links a {
+	display: inline-block;
+	background: #1c6ea4;
+	color: #ffffff;
+	padding: 2px 8px;
+	border-radius: 5px;
+}
+
+table.productsList, table.returned_productsList {
+	width: 100%;
+	border-collapse: collapse;
+}
+table.productsList td,
+table.productsList th, table.returned_productsList td, table.returned_productsList th {
+	border: 0px solid #000000;
+	padding: 5px 4px;
+}
+table.productsList tbody td, table.returned_productsList tbody td {
+	font-size: 14px;
+}
+table.productsList tfoot td, table.returned_productsList tfoot td {
+	font-size: 14px;
+}
+
+@media (max-width: 767px) {
+	body {
+		font-size: 0.8em;
+	}
+	.invoice_options, .payment_tax, .payment_discount, .payment_discount_method {
+		flex-direction: column;
+	}
+	
+}
+.has-error {
+    border-color: red;
+}

@@ -1,0 +1,8 @@
+-  pdf dar site zaxire shavad
+-  Reports Page Back-End Editable (!?)
+
+Problems:
+-  date JALALI bashad
+
+- http://localhost:8012/wordpress2/wp-admin/admin.php?page=xi-reports&report-type=customers
+    majmu kolle xarid?
