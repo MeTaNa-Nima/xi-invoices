@@ -1,12 +1,12 @@
 @font-face {
     font-family: 'Yekan';
-    src: url('../assets/Yekan.woff') format('woff');
+    src: url('../fonts/Yekan.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 }
 @font-face {
     font-family: 'IRANSansFaNum';
-    src: url('../assets/IRANSansFaNum.woff') format('woff');
+    src: url('../fonts/IRANSansFaNum.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 }
