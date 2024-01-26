@@ -11,7 +11,7 @@
     font-style: normal;
 }
 
-body, input, select {
+body, input, select, h1, h2, h3, h4, h5, h6, p {
     font-family: 'IRANSansFaNum', sans-serif !important;
 }
 

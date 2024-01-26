@@ -264,6 +264,7 @@ function report_by_visitors()
         <th scope="row">کل تخفیفات</th>
         <th scope="row">ویزیتور با گران ترین فاکتور</th>
         <th scope="row">ویزیتور با بیشترین تعداد محصول فروخته شده</th>
+        <th scope="row">جمع کل خرید ها</th>
     </tr>
     <?php
         foreach ($customers as $customer) {
@@ -358,6 +359,15 @@ function report_by_visitors()
             $top_visitor_by_items = $wpdb->get_row($top_visitor_by_items_query);
             $topVisitorByItems = $top_visitor_by_items ? get_user_by('id', $top_visitor_by_items->visitor_id)->display_name . ' (' . $top_visitor_by_items->total_items . ' قلم)' : 'Unknown';
 
+            // Get total Sales by this customer
+            $total_sale_query = $wpdb->prepare(
+                "SELECT SUM(op.order_total_final) as total_sale
+                FROM $operation_table op
+                WHERE op.customer_id = %d",
+                $customer_id
+            );
+            $totalSale = $wpdb->get_var($total_sale_query);
+            
             // Display the data
     ?>
         <tr valign="top">
@@ -365,9 +375,10 @@ function report_by_visitors()
             <td scope="row" class=""><a href="<?php echo esc_url($linkToInvoice); ?>"><?php echo number_format($biggestBuyPrice); ?></a></td>
             <td scope="row" class=""><?php echo esc_html($mostProductBought); ?></td>
             <td scope="row" class=""><?php echo esc_html($mostPaymentMethod); ?></td>
-            <td scope="row" class=""><?php echo number_format($totalDiscount); ?></td>
+            <td scope="row" class=""><?php echo esc_html(number_format($totalDiscount)); ?></td>
             <td scope="row" class=""><?php echo esc_html($topVisitorByPrice); ?></td>
             <td scope="row" class=""><?php echo esc_html($topVisitorByItems); ?></td>
+            <td scope="row" class=""><?php echo esc_html(number_format($totalSale)); ?></td>
         </tr>
     <?php
         }

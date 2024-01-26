@@ -17,8 +17,8 @@ function x_invoice_shortcode()
     $user_display_name = $current_user->display_name;
 
     ob_start();
-    $today = date('Y-m-d');
-    $current_date_time = current_time('Y-m-d H:i:s');
+    $today = jdate('Y/n/j');
+    $current_date_time = jdate('Y/n/j');
 
     $customers_table_name   = $wpdb->prefix . 'x_invoice_customers';
     $products_table_name    = $wpdb->prefix . 'x_invoice_products';
@@ -31,7 +31,6 @@ function x_invoice_shortcode()
 
     $taxAmount              = get_option('taxAmount', 'applied-tax');
 ?>
-    <?php echo current_time('Y-m-d', false); ?>
     <form id="x-invoice" class="x-invoice" action="" method="post">
         <h2 class="x-invoice-title"></h2>
         <div class="x-invoice-form-inputs">
@@ -283,7 +282,7 @@ function x_invoice_ajax_submit_invoice()
         'order_total_tax'           => $order_total_tax,
         'order_include_discount'    => $order_include_discount,
         'discount_method'           => $discount_method,
-        'date_submit_gmt'           => current_time('mysql', 1), // GMT time
+        'date_submit_gmt'           => jdate('Y/n/j'), // GMT time
         'discount_total_amount'     => $discount_total_amount,
         'discount_total_percentage' => $discount_total_percentage,
         'payment_method'            => $payment_method,
@@ -318,7 +317,7 @@ function x_invoice_ajax_submit_invoice()
                 'product_total_price'   => $total_price,
                 'customer_id'           => $customer_id,
                 'product_sale_return'   => $sale_return_flag, // Save the sale/return flag
-                'date_submit'           => current_time('mysql')
+                'date_submit'           => jdate('Y/n/j')
             )
         );
     }

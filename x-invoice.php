@@ -15,8 +15,9 @@ require_once plugin_dir_path(__FILE__) . 'includes/database/db-functions.php';
 
 
 // Starting File reStructuring:
-require_once plugin_dir_path( __FILE__ ) . 'includes/admin/settings.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/jdf.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/helper-functions.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/admin/settings.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/public/shortcodes/x-invoice-shortcode.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/public/shortcodes/x-invoice-view-order-shortcode.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/admin/add-customers-data.php';
@@ -117,7 +118,7 @@ add_action('admin_enqueue_scripts', 'x_invoice_enqueue_admin_styles');
 function invoice_main_function()
 {
     echo '<div class="wrap">';
-    echo '<h1>به افزونه ایکس فاکتور خوش آمدید</h1>';
+    echo '<h1>به افزونه ایکس فاکتور خوش آمدید | نسخه  ' . X_INVOICE_VERSION . '</h1>';
     settings();
     echo '</div>';
 }
