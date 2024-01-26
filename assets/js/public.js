@@ -1,18 +1,58 @@
 jQuery(document).ready(function ($) {
+    // Function to parse input string as a number
+    function parseInputValue(value) {
+        if (!value) {
+            return 0;
+        }
+        return parseFloat(value.replace(/,/g, '')) || 0;
+    }
+
+    // Function to add thousand separator for display
+    function formatNumberForDisplay(num) {
+        return num.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    // Event Handler to format number while typing
+    $(document).on('input', ".custom_product_amount, .custom_product_price", function() {
+        var $this = $(this);
+        var inputVal = $this.val();
+        var caretPos = this.selectionStart; // Get the cursor position before formatting
+
+        // Remove non-digit characters (except decimal point)
+        var cleanInput = inputVal.replace(/[^\d.]/g, '');
+
+        // Handle the edge case where the input may start with a non-numeric character
+        if (cleanInput === '') {
+            $this.val('');
+            return;
+        }
+
+        // Formatting the input value
+        var formattedInput = parseFloat(cleanInput).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+        $this.val(formattedInput);
+
+        // Calculate the difference in length between the original and the formatted value
+        var diff = formattedInput.length - inputVal.length;
+
+        // Set the cursor back to the correct position after formatting
+        this.setSelectionRange(caretPos + diff, caretPos + diff);
+    });
+
     // Update the total for a single row
     function updateRowTotal(row) {
-        var amount = parseFloat(row.find(".custom_product_amount").val()) || 0;
-        var price = parseFloat(row.find(".custom_product_price").val()) || 0;
+        var amount = parseInputValue(row.find(".custom_product_amount").val());
+        var price = parseInputValue(row.find(".custom_product_price").val());
         var total = amount * price;
-        row.find(".custom_product_total").val(total.toFixed(0));
-        row.find(".custom_product_show_only").html(total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, "."));
+        row.find(".custom_product_total").val(formatNumberForDisplay(total));
+        row.find(".custom_product_show_only").html(formatNumberForDisplay(total));
     }
 
     // Calculate the total of all rows
     function calculateInvoiceTotal() {
         var invoiceTotalPrice = 0;
         $(".productsList .custom_product_total").each(function () {
-            invoiceTotalPrice += parseFloat($(this).val()) || 0;
+            invoiceTotalPrice += parseInputValue($(this).val());
         });
         return invoiceTotalPrice;
     }
@@ -22,7 +62,7 @@ jQuery(document).ready(function ($) {
         var invoiceTotalReturnedPrice = 0;
         if ($('#include_returned_products').is(':checked')) {
             $(".returned_productsList .custom_product_total").each(function () {
-                invoiceTotalReturnedPrice += parseFloat($(this).val()) || 0;
+                invoiceTotalReturnedPrice += parseInputValue($(this).val());
             });
         }
         return invoiceTotalReturnedPrice;
@@ -33,10 +73,10 @@ jQuery(document).ready(function ($) {
         var discountAmount = 0;
         if ($('#invoice_discount').is(':checked')) {
             if ($('#payment_percents').is(':checked')) {
-                var discountPercentage = parseFloat($('#discount_percents').val()) || 0;
+                var discountPercentage = parseInputValue($('#discount_percents').val());
                 discountAmount = (invoiceTotal - invoiceReturnedTotal) * (discountPercentage / 100);
             } else if ($('#payment_constant').is(':checked')) {
-                discountAmount = parseFloat($('#discount_constant').val()) || 0;
+                discountAmount = parseInputValue($('#discount_constant').val());
             }
         }
         return discountAmount;
@@ -46,7 +86,7 @@ jQuery(document).ready(function ($) {
     function calculateTax(invoiceTotal, invoiceReturnedTotal) {
         var taxAmount = 0;
         if ($('#invoice_includes_tax').is(':checked')) {
-            var taxPercentage = parseFloat($('#tax_amount_value').val()) || 0;
+            var taxPercentage = parseInputValue($('#tax_amount_value').val());
             taxAmount = (invoiceTotal - invoiceReturnedTotal) * (taxPercentage / 100);
         }
         return taxAmount;
@@ -60,15 +100,21 @@ jQuery(document).ready(function ($) {
         var taxAmount = calculateTax(invoiceTotal, invoiceReturnedTotal);
         var finalTotal = invoiceTotal - invoiceReturnedTotal - discountAmount + taxAmount;
 
-        $(".invoice_total_pure").val(invoiceTotal.toFixed(0));
-        $(".invoice_total_pure_show_only").html(invoiceTotal.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, "."));
+        $(".invoice_total_pure").val(formatNumberForDisplay(invoiceTotal));
+        $(".invoice_total_pure_show_only").html(formatNumberForDisplay(invoiceTotal));
 
-        $(".invoice_total_returned_pure").val(invoiceReturnedTotal.toFixed(0));
-        $(".invoice_total_returned_pure_show_only").html(invoiceReturnedTotal.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, "."));
+        $(".invoice_total_returned_pure").val(formatNumberForDisplay(invoiceReturnedTotal));
+        $(".invoice_total_returned_pure_show_only").html(formatNumberForDisplay(invoiceReturnedTotal));
 
-        $(".invoice_total_prices").val(finalTotal.toFixed(0));
-        $(".invoice_total_prices_show_only").html(finalTotal.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, "."));
+        $(".invoice_total_prices").val(formatNumberForDisplay(finalTotal));
+        $(".invoice_total_prices_show_only").html(formatNumberForDisplay(finalTotal));
     }
+
+
+
+
+
+
 
     // Event Handlers
     $(".productsList").on("input", ".custom_product_amount, .custom_product_price", function () {
@@ -200,17 +246,37 @@ jQuery(document).ready(function ($) {
         // Clear previous error messages and highlights
         $('.xi-form-error-msg').text('');
         $('.has-error').removeClass('has-error');
-
-        // Validate select fields
+    
+        // Validate select fields for customers
         var isValid = true;
-        $('#x-invoice select').each(function () {
+        $('select#customer_name').each(function () {
             if ($(this).val() === '-1') {
                 isValid = false;
                 $(this).addClass('has-error');
-                $('.xi-form-error-msg').text('لطفا فیلد ها را به درستی انتخاب کنید.');
+                $('.xi-form-error-msg').text('لطفا فیلد مشتری را به درستی انتخاب کنید.');
             }
         });
 
+        // Validate select fields for main products
+        $('#productsList select').each(function () {
+            if ($(this).val() === '-1') {
+                isValid = false;
+                $(this).addClass('has-error');
+                $('.xi-form-error-msg').text('لطفا فیلد های محصولات را به درستی انتخاب کنید.');
+            }
+        });
+    
+        // Validate select fields for returned products only if "include_returned_products" is checked
+        if ($('#include_returned_products').is(':checked')) {
+            $('#returned_productsList select').each(function () {
+                if ($(this).val() === '-1') {
+                    isValid = false;
+                    $(this).addClass('has-error');
+                    $('.xi-form-error-msg').text('لطفا فیلد های محصولات مرجوعی را به درستی انتخاب کنید.');
+                }
+            });
+        }
+    
         if (!isValid) {
             // If not valid, prevent form submission and highlight the error message
             $('.xi-form-error-msg').css('color', 'red');
@@ -237,25 +303,26 @@ jQuery(document).ready(function ($) {
         $('#productsList tbody tr').each(function() {
             var productData = {
                 'product_id'        : $(this).find('.custom_product_name').val(),
-                'quantity'          : $(this).find('.custom_product_amount').val(),
-                'net_price'         : $(this).find('.custom_product_price').val(),
+                'quantity'          : parseInputValue($(this).find('.custom_product_amount').val()),
+                'net_price'         : parseInputValue($(this).find('.custom_product_price').val()),
                 'total_price'       : $(this).find('.custom_product_total').val(),
                 'sale_return_flag'  : 'sold' // Flag indicating the product is sold
             };
             formData.products.push(productData);
         });
         
-        $('#returned_productsList tbody tr').each(function() {
-            var returnedProductData = {
-                'product_id'        : $(this).find('.custom_product_name').val(),
-                'quantity'          : $(this).find('.custom_product_amount').val(),
-                'net_price'         : $(this).find('.custom_product_price').val(),
-                'total_price'       : $(this).find('.custom_product_total').val(),
-                'sale_return_flag'  : 'returned' // Flag indicating the product is returned
-            };
-            formData.products.push(returnedProductData);
-        });
-        
+        if ($('#include_returned_products').is(':checked')) {
+            $('#returned_productsList tbody tr').each(function() {
+                var returnedProductData = {
+                    'product_id'        : $(this).find('.custom_product_name').val(),
+                    'quantity'          : parseInputValue($(this).find('.custom_product_amount').val()),
+                    'net_price'         : parseInputValue($(this).find('.custom_product_price').val()),
+                    'total_price'       : parseInputValue($(this).find('.custom_product_total').val()),
+                    'sale_return_flag'  : 'returned' // Flag indicating the product is returned
+                };
+                formData.products.push(returnedProductData);
+            });
+        }
 
         $.post(myAjax.ajaxurl, formData, function(response) {
             if (response.success) {

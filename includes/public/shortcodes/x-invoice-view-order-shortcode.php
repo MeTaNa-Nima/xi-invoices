@@ -124,7 +124,7 @@ function x_invoice_view_order_shortcode()
             $xi_invoice_view_output .= '</table>';
         }
         $xi_invoice_view_output .= '<table class="xi-pricing">';
-        $xi_invoice_view_output .= '<tr><td><b>جمع کل:</b></td><td class="xi-table-prices">' . esc_html(number_format($invoice->order_total_pure)) . ' تومان</td></tr>';
+        $xi_invoice_view_output .= '<tr><td><b>جمع کل:</b></td><td class="xi-table-prices">' . esc_html(number_format($invoice->order_total_pure)) . ' ریال</td></tr>';
         if ($invoice->order_include_tax === 'yes') {
             $xi_invoice_view_output .= '<tr><td><b>مقدار مالیات:</b></td><td class="xi-table-prices"> ' . esc_html(number_format($invoice->order_total_tax)) . ' %</td></tr>';
         }
@@ -132,10 +132,10 @@ function x_invoice_view_order_shortcode()
             if ($invoice->discount_method === 'درصد') {
                 $xi_invoice_view_output .= '<tr><td><b>مقدار تخفیف:</b></td><td class="xi-table-prices"> ' . esc_html(number_format($invoice->discount_total_percentage)) . ' %</td></tr>';
             } elseif ($invoice->discount_method === 'مبلغ ثابت') {
-                $xi_invoice_view_output .= '<tr><td><b>مقدار تخفیف:</b></td><td class="xi-table-prices"> ' . esc_html(number_format($invoice->discount_total_amount)) . ' تومان </td></tr>';
+                $xi_invoice_view_output .= '<tr><td><b>مقدار تخفیف:</b></td><td class="xi-table-prices"> ' . esc_html(number_format($invoice->discount_total_amount)) . ' ریال</td></tr>';
             }
         }
-        $xi_invoice_view_output .= '<tr><td><b>مبلغ نهایی:</b></td><td class="xi-table-prices">' . esc_html(number_format($invoice->order_total_final)) . ' تومان</td></tr>';
+        $xi_invoice_view_output .= '<tr><td><b>مبلغ نهایی:</b></td><td class="xi-table-prices">' . esc_html(number_format($invoice->order_total_final)) . ' ریال</td></tr>';
         $xi_invoice_view_output .= '</table>';
         // Footer End
         $xi_invoice_view_output .= '<div class="xi-invoice-footer">';

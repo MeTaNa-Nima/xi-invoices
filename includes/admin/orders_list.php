@@ -137,7 +137,7 @@ function x_invoice_orders_page()
                             <table class="form-table striped table-view-list widefat wp-list-table" id="form-table striped widefat fixed">
                                 <tr>
                                     <th>محصول</th>
-                                    <th>تعداد/مقدار</th>
+                                    <th>تعداد</th>
                                     <th>قیمت واحد</th>
                                     <th>قیمت کل</th>
                                 </tr>

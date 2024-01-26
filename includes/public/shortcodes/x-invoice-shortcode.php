@@ -40,7 +40,7 @@ function x_invoice_shortcode()
                         <th>کاربر</th>
                         <th>تاریخ</th>
                         <th>نام مشتری</th>
-                        <th>کد ملی مشتری</th>
+                        <th>نام فروشگاه</th>
                         <th>آدرس</th>
                     </tr>
                 </thead>
@@ -67,7 +67,7 @@ function x_invoice_shortcode()
                             </select>
                             <input type="hidden" class="this_customer_id" name="this_customer_id" value="">
                         </td>
-                        <td class="x_invoice_top_td"><input class="customer_national_id" readonly type="" value=""></td>
+                        <td class="x_invoice_top_td"><input class="customer_shop_name" readonly type="" value=""></td>
                         <td class="x_invoice_top_td"><input class="customer_national_address" readonly type="" value=""></td>
                     </tr>
                 </tbody>
@@ -76,7 +76,7 @@ function x_invoice_shortcode()
             <table class="productsList" id="productsList">
                 <tbody>
                     <th>نام محصول</th>
-                    <th>مقدار (mL)</th>
+                    <th>تعداد</th>
                     <th>قیمت واحد</th>
                     <th>جمع</th>
                     <th>افزودن/حذف
@@ -95,8 +95,8 @@ function x_invoice_shortcode()
                                 ?>
                             </select>
                         </td>
-                        <td class="x_invoice_table_td"><input class="custom_product_amount" type="text"></td>
-                        <td class="x_invoice_table_td"><input class="custom_product_price" type="text"></td>
+                        <td class="x_invoice_table_td"><input class="custom_product_amount" type="text" inputmode="numeric" pattern="[0-9]*"></td>
+                        <td class="x_invoice_table_td"><input class="custom_product_price" type="text" inputmode="numeric" pattern="[0-9]*"></td>
                         <td class="x_invoice_table_td">
                             <span class="custom_product_show_only"></span>
                             <input readonly type="hidden" class="custom_product_total" value="">
@@ -115,7 +115,7 @@ function x_invoice_shortcode()
                 </div>
                 <div class="invoice_total_output">
                     <span class="invoice_total_pure_show_only"></span>
-                    <input readonly type="hidden" name="invoice_total_pure" class="invoice_total_pure" value="">
+                    <input readonly type="hidden" name="invoice_total_pure" class="invoice_total_pure" value=""> ریال
                 </div>
             </div>
             <hr>
@@ -124,7 +124,7 @@ function x_invoice_shortcode()
                 <table class="returned_productsList" id="returned_productsList">
                     <tbody>
                         <th>نام محصول</th>
-                        <th>مقدار (mL)</th>
+                        <th>تعداد</th>
                         <th>قیمت واحد</th>
                         <th>جمع</th>
                         <th>افزودن/حذف
@@ -143,8 +143,8 @@ function x_invoice_shortcode()
                                     ?>
                                 </select>
                             </td>
-                            <td class="x_invoice_table_td"><input class="custom_product_amount" type="text"></td>
-                            <td class="x_invoice_table_td"><input class="custom_product_price" type="text"></td>
+                            <td class="x_invoice_table_td"><input class="custom_product_amount" type="number" inputmode="numeric"></td>
+                            <td class="x_invoice_table_td"><input class="custom_product_price" type="text" inputmode="numeric"></td>
                             <td class="x_invoice_table_td">
                                 <span class="custom_product_show_only"></span>
                                 <input readonly type="hidden" class="custom_product_total" value="">
@@ -163,7 +163,7 @@ function x_invoice_shortcode()
                     </div>
                     <div class="invoice_total_returned_output">
                         <span class="invoice_total_returned_pure_show_only"></span>
-                        <input readonly type="hidden" name="invoice_total_returned_pure" class="invoice_total_returned_pure" value="">
+                        <input readonly type="hidden" name="invoice_total_returned_pure" class="invoice_total_returned_pure" value=""> ریال
                     </div>
                 </div>
                 <hr>
@@ -215,13 +215,13 @@ function x_invoice_shortcode()
                 </div>
                 <div class="invoice_total_output">
                     <span class="invoice_total_prices_show_only"></span>
-                    <input readonly type="hidden" name="invoice_total_prices" class="invoice_total_prices" value="">
+                    <input readonly type="hidden" name="invoice_total_prices" class="invoice_total_prices" value=""> ریال
                 </div>
 
             </div>
             <hr>
             <div class="submit-section">
-                <input type="submit" id="submit_invoice" name="submit" class="button-primary" value="Register Invoice" style="display: none;">
+                <input type="submit" id="submit_invoice" name="submit" class="button-primary" value="ثبت فاکتور" style="display: none;">
                 <div class="xi-form-error-msg"></div>
             </div>
         </div>
@@ -231,7 +231,7 @@ function x_invoice_shortcode()
         function fetchCustomerDetails(customerId) {
             if (customerId == -1) {
                 // Reset the fields if no customer is selected
-                jQuery('.customer_national_id').val('');
+                jQuery('.customer_shop_name').val('');
                 jQuery('.customer_national_address').val('');
                 return;
             }
@@ -245,7 +245,7 @@ function x_invoice_shortcode()
                 success: function(response) {
                     if (response) {
                         var data = JSON.parse(response);
-                        jQuery('.customer_national_id').val(data.national_id);
+                        jQuery('.customer_shop_name').val(data.national_id);
                         jQuery('.customer_national_address').val(data.address);
                     }
                 }
@@ -346,7 +346,7 @@ function get_customer_details()
         $table_name = $wpdb->prefix . 'x_invoice_customers';
         $customer = $wpdb->get_row("SELECT * FROM $table_name WHERE customer_id = $customer_id", ARRAY_A);
         if ($customer) {
-            echo json_encode(array('national_id' => $customer['customer_national_id'], 'address' => $customer['customer_address']));
+            echo json_encode(array('national_id' => $customer['customer_shop_name'], 'address' => $customer['customer_address']));
         } else {
             echo json_encode(array('national_id' => '', 'address' => ''));
         }
