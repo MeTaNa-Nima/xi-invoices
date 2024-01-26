@@ -140,7 +140,7 @@ function x_invoice_view_order_shortcode()
         // Footer End
         $xi_invoice_view_output .= '<div class="xi-invoice-footer">';
         $xi_invoice_view_output .= '<div class="thanks-message"><b>تشکر از خرید شما، به امید دیدار مجدد.</b></div>';
-        $xi_invoice_view_output .= '<table><tbody>';
+        $xi_invoice_view_output .= '<table class="xi-footer-table"><tbody>';
         $xi_invoice_view_output .= '<tr><td>مدیر فروش (استادی)</td><td>۰۹۳۰۴۹۴۶۶۹۴</td></tr>';
         $xi_invoice_view_output .= '<tr><td>مدیر تولید (قنبری)</td><td>۰۹۱۹۸۵۲۱۸۵۶</td></tr>';
         $xi_invoice_view_output .= '<tr class="links"><td class="site">www.NikPerfume.com</td><td class="instagram">Instagram: NiikPerfume</td></tr>';

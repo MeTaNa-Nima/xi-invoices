@@ -31,6 +31,7 @@ function x_invoice_shortcode()
 
     $taxAmount              = get_option('taxAmount', 'applied-tax');
 ?>
+    <h3 class="current-date">تاریخ امروز: <?php echo $current_date_time; ?></h3>
     <form id="x-invoice" class="x-invoice" action="" method="post">
         <h2 class="x-invoice-title"></h2>
         <div class="x-invoice-form-inputs">
@@ -38,7 +39,6 @@ function x_invoice_shortcode()
                 <thead>
                     <tr>
                         <th>کاربر</th>
-                        <th>تاریخ</th>
                         <th>نام مشتری</th>
                         <th>نام فروشگاه</th>
                         <th>آدرس</th>
@@ -49,9 +49,6 @@ function x_invoice_shortcode()
                         <td class="x_invoice_top_td">
                             <input class="current_user" readonly type="" value="<?php echo $user_display_name; ?>">
                             <input type="hidden" name="" value="<?php echo $user_id; ?>">
-                        </td>
-                        <td class="x_invoice_top_td">
-                            <input type="text" readonly class="today-date" name="today-date" value="<?php echo $today; ?>">
                             <input type="hidden" readonly class="current-date-time" name="current-date-time" value="<?php echo $current_date_time; ?>">
                         </td>
                         <td class="x_invoice_top_td">
