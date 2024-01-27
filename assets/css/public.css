@@ -99,7 +99,7 @@ body, input, select, h1, h2, h3, h4, h5, h6, p {
 	table.xi-footer-table,
 	table.xi-footer-table th,
 	table.xi-footer-table td {
-
+		text-align: center;
 	}
 	tr.links td.site {
 		border-left: 1px dashed;

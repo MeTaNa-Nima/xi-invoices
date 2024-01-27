@@ -9,7 +9,7 @@ function settings()
     if (isset($_POST['save'])) {
         // Sanitize and save the settings
         update_option('taxAmount',          sanitize_text_field($_POST['applied-tax']));
-        // update_option('colHeader1',         sanitize_text_field($_POST['setting1']));
+        update_option('dateFormat',         sanitize_text_field($_POST['date_format']));
         // update_option('colHeader2',         sanitize_text_field($_POST['setting2']));
         // update_option('colHeader3',         sanitize_text_field($_POST['setting3']));
         // update_option('colHeader4',         sanitize_text_field($_POST['setting4']));
@@ -24,7 +24,7 @@ function settings()
 
     // Retrieve current settings
     $taxAmount        = get_option('taxAmount',     'applied-tax');
-    // $colHeader1         = get_option('colHeader1',      'نام آزمایشگاه');
+    $dateFormat       = get_option('dateFormat',    'date_format');
     // $colHeader2         = get_option('colHeader2',      'شماره پاکت');
     // $colHeader3         = get_option('colHeader3',      'عیار');
     // $colHeader4         = get_option('colHeader4',      'شماره آزمایشگاه');
@@ -40,8 +40,13 @@ function settings()
                 <td><input type="number" name="applied-tax" value="<?php echo $taxAmount ?>"></td>
             </tr>
             <tr>
-                <th><label for="options2">تنظیمات دوم</label></th>
-                <td><input disabled type="text" name="options2" value=""></td>
+                <th><label for="date_format">فرمت تاریخ</label></th>
+                <td>
+                    <input type="radio" id="date_format_jalali" class="date_format date_format_jalali" name="date_format" value="jalali" <?php echo ($dateFormat == 'jalali') ? 'checked' : ''; ?>>
+                    <label for="date_format_jalali">شمسی</label>
+                    <input type="radio" id="date_format_georgian" class="date_format date_format_georgian" name="date_format" value="georgian"<?php echo ($dateFormat == 'georgian') ? 'checked' : ''; ?>>
+                    <label for="date_format_georgian">میلادی</label>
+                </td>
             </tr>
             <tr>
                 <th><label for="options3">تنظیمات سوم</label></th>

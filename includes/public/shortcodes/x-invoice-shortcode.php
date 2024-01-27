@@ -12,13 +12,22 @@ function x_invoice_shortcode()
 {
     global $wpdb;
 
+    $taxAmount              = get_option('taxAmount', 'applied-tax');
+    $dateFormat             = get_option('dateFormat',    'date_format');
+
     $current_user = wp_get_current_user();
     $user_id = $current_user->ID;
     $user_display_name = $current_user->display_name;
 
     ob_start();
-    $today = jdate('Y/n/j');
-    $current_date_time = jdate('Y/n/j');
+    if ($dateFormat == 'jalali') {
+        $today = jdate('Y/n/j');
+        $current_date_time = jdate('Y/n/j');
+    } else {
+        $today = date('Y/n/j');
+        $current_date_time = date('Y/n/j');
+    }
+    
 
     $customers_table_name   = $wpdb->prefix . 'x_invoice_customers';
     $products_table_name    = $wpdb->prefix . 'x_invoice_products';
@@ -29,7 +38,7 @@ function x_invoice_shortcode()
     $operations_data        = $wpdb->get_results("SELECT * FROM $operations_table_name", ARRAY_A);
     $data_lookup_data       = $wpdb->get_results("SELECT * FROM $data_lookup_table_name", ARRAY_A);
 
-    $taxAmount              = get_option('taxAmount', 'applied-tax');
+
 ?>
     <h3 class="current-date">تاریخ امروز: <?php echo $current_date_time; ?></h3>
     <form id="x-invoice" class="x-invoice" action="" method="post">
