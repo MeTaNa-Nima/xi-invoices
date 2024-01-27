@@ -10,42 +10,39 @@ if (!defined('ABSPATH')) {
 // Front Invoice Shortcode
 function x_invoice_shortcode()
 {
-    global $wpdb;
+    // global $wpdb;
 
     $products           = new Xi_Invoices_Products();
     $customers          = new Xi_Invoices_Customers();
 
-
     $products_data      = $products->get_all_products();
     $customers_data     = $customers->get_all_customers();
-
 
     $taxAmount          = get_option('taxAmount', 'applied-tax');
     $dateFormat         = get_option('dateFormat', 'date_format');
     $current_user       = wp_get_current_user();
     $user_id            = $current_user->ID;
     $user_display_name  = $current_user->display_name;
-
-    ob_start();
     if ($dateFormat == 'jalali') {
-        $today = jdate('Y/n/j');
-        $current_date_time = jdate('Y/n/j H:i');
+        $today = tr_num(jdate('Y/n/j'));
+        $current_date_time = tr_num(jdate('Y/n/j H:i:s'));
     } else {
         $today = date('Y/n/j');
-        $current_date_time = date('Y/n/j H:i');
+        $current_date_time = date('Y/n/j H:i:s');
     }
+
+    ob_start();
+    
     
 
-    $customers_table_name   = $wpdb->prefix . 'x_invoice_customers';
-    $products_table_name    = $wpdb->prefix . 'x_invoice_products';
-    $operations_table_name  = $wpdb->prefix . 'x_invoice_operation_data';
-    $data_lookup_table_name = $wpdb->prefix . 'x_invoice_data_lookup';
-    
+    // $customers_table_name   = $wpdb->prefix . 'x_invoice_customers';
+    // $products_table_name    = $wpdb->prefix . 'x_invoice_products';
+    // $operations_table_name  = $wpdb->prefix . 'x_invoice_operation_data';
+    // $data_lookup_table_name = $wpdb->prefix . 'x_invoice_data_lookup';
     // $customers_data         = $wpdb->get_results("SELECT * FROM $customers_table_name", ARRAY_A);
     // $products_data          = $wpdb->get_results("SELECT * FROM $products_table_name", ARRAY_A);
-    
-    $operations_data        = $wpdb->get_results("SELECT * FROM $operations_table_name", ARRAY_A);
-    $data_lookup_data       = $wpdb->get_results("SELECT * FROM $data_lookup_table_name", ARRAY_A);
+    // $operations_data        = $wpdb->get_results("SELECT * FROM $operations_table_name", ARRAY_A);
+    // $data_lookup_data       = $wpdb->get_results("SELECT * FROM $data_lookup_table_name", ARRAY_A);
 
 
 ?>
@@ -66,7 +63,7 @@ function x_invoice_shortcode()
                         <td class="x_invoice_top_td">
                             <input class="current_user" readonly type="" value="<?php echo $user_display_name; ?>">
                             <input type="hidden" name="" value="<?php echo $user_id; ?>">
-                            <input type="hidden" readonly class="current-date-time" name="current-date-time" value="<?php echo $today; ?>">
+                            <input type="hidden" readonly id="current-date-time" class="current-date-time" name="current-date-time" value="<?php echo $current_date_time; ?>">
                         </td>
                         <td class="x_invoice_top_td">
                             <select name="customer_name" class="customer_name" id="customer_name" onChange="fetchCustomerDetails(this.value)">
@@ -112,8 +109,8 @@ function x_invoice_shortcode()
                                 ?>
                             </select>
                         </td>
-                        <td class="x_invoice_table_td"><input class="custom_product_amount" type="text" inputmode="numeric" pattern="[0-9]*"></td>
-                        <td class="x_invoice_table_td"><input class="custom_product_price" type="text" inputmode="numeric" pattern="[0-9]*"></td>
+                        <td class="x_invoice_table_td"><input class="custom_product_amount" type="text" inputmode="numeric"></td>
+                        <td class="x_invoice_table_td"><input class="custom_product_price" type="text" inputmode="numeric"></td>
                         <td class="x_invoice_table_td">
                             <span class="custom_product_show_only"></span>
                             <input readonly type="hidden" class="custom_product_total" value="">
@@ -160,7 +157,7 @@ function x_invoice_shortcode()
                                     ?>
                                 </select>
                             </td>
-                            <td class="x_invoice_table_td"><input class="custom_product_amount" type="number" inputmode="numeric"></td>
+                            <td class="x_invoice_table_td"><input class="custom_product_amount" type="text" inputmode="numeric"></td>
                             <td class="x_invoice_table_td"><input class="custom_product_price" type="text" inputmode="numeric"></td>
                             <td class="x_invoice_table_td">
                                 <span class="custom_product_show_only"></span>
@@ -278,11 +275,12 @@ function x_invoice_shortcode()
 /* Start Data Sending via Ajax */
 function x_invoice_ajax_submit_invoice()
 {
-    global $wpdb;
+    // global $wpdb;
     check_ajax_referer('x_invoice_nonce', 'security');
 
     // Extract and sanitize data from $_POST
     $customer_id                = sanitize_text_field($_POST['customer_id']);
+    $date_time                  = sanitize_text_field($_POST['date_time']);
     $order_include_tax          = sanitize_text_field($_POST['order_include_tax']);
     $order_total_tax            = sanitize_text_field($_POST['order_total_tax']);
     $order_include_discount     = sanitize_text_field($_POST['order_include_discount']);
@@ -301,7 +299,7 @@ function x_invoice_ajax_submit_invoice()
         'order_total_tax'           => $order_total_tax,
         'order_include_discount'    => $order_include_discount,
         'discount_method'           => $discount_method,
-        'date_submit_gmt'           => jdate('Y/n/j'), // GMT time
+        'date_submit_gmt'           => $date_time,
         'discount_total_amount'     => $discount_total_amount,
         'discount_total_percentage' => $discount_total_percentage,
         'payment_method'            => $payment_method,
@@ -311,47 +309,49 @@ function x_invoice_ajax_submit_invoice()
         'visitor_id'                => $visitor_id,
         'include_returned_products' => $include_returned_products,
     );
-    $wpdb->insert(
-        $wpdb->prefix . 'x_invoice_operation_data',
-        $operation_data
-    );
-    $invoice_id = $wpdb->insert_id;
 
-    // Handle product data for sold products
-    $products = $_POST['products']; // Array of products
-    foreach ($products as $product) {
-        $product_id         = sanitize_text_field($product['product_id']);
-        $quantity           = sanitize_text_field($product['quantity']);
-        $net_price          = sanitize_text_field($product['net_price']);
-        $total_price        = sanitize_text_field($product['total_price']);
-        $sale_return_flag   = sanitize_text_field($product['sale_return_flag']); // Get the sale/return flag
+    $invoice = new Xi_Invoices_Invoice();
+    $invoice_id = $invoice->add_invoice($operation_data);
 
-        $wpdb->insert(
-            $wpdb->prefix . 'x_invoice_data_lookup',
-            array(
-                'order_id'              => $invoice_id,
-                'product_id'            => $product_id,
-                'product_qty'           => $quantity,
-                'product_net_price'     => $net_price,
-                'product_total_price'   => $total_price,
-                'customer_id'           => $customer_id,
-                'product_sale_return'   => $sale_return_flag, // Save the sale/return flag
-                'date_submit'           => jdate('Y/n/j')
-            )
+    
+
+    // Prepare and sanitize product details
+    $products_details = array_map(function($product) {
+        return array(
+            'product_id'           => sanitize_text_field($product['product_id']),
+            'product_qty'          => sanitize_text_field($product['quantity']),
+            'product_net_price'    => sanitize_text_field($product['net_price']),
+            'product_total_price'  => sanitize_text_field($product['total_price']),
+            'customer_id'          => sanitize_text_field($_POST['customer_id']),
+            'product_sale_return'  => sanitize_text_field($product['sale_return_flag']),
+            'date_submit'          => sanitize_text_field($product['date_time'])
         );
-    }
+    }, $_POST['products']);
+    
 
-    // Update the order_id with the invoice_id
-    $wpdb->update(
-        $wpdb->prefix . 'x_invoice_operation_data',
-        array('order_id'    => $invoice_id),
-        array('invoice_id'  => $invoice_id)
-    );
+    // Add product details
+    $invoice->add_product_details($invoice_id, $products_details);
 
+
+    /////////////////////////
+    // $new_data = array(
+    //     'product_id'           => '1',
+    //     'product_qty'          => '1000',
+    //     'product_net_price'    => '1000',
+    //     'product_total_price'  => '1000',
+    //     'customer_id'          => '1'
+
+    // );
+    // $invoice->add_product_details_debug($new_data);
+    /////////////////////////
+
+
+    // Update the order_id
+    $invoice->update_order_id($invoice_id);
     wp_send_json_success(array(
         'message' => 'Invoice created successfully',
         'invoice_id' => $invoice_id,
-        'redirect_url' => home_url('/view-invoice/') // Add the redirect URL to the response
+        'redirect_url' => home_url('/view-invoice/') 
     ));
 }
 /* End Data Sending via Ajax */

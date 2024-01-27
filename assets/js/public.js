@@ -287,6 +287,7 @@ jQuery(document).ready(function ($) {
             'action'                    : 'x_invoice_submit_invoice',
             'security'                  : myAjax.nonce,
             'customer_id'               : $('#customer_name').val(),
+            'date_time'                 : $('#current-date-time').val(),
             'order_include_tax'         : $('#invoice_includes_tax').is(':checked') ? 'yes' : 'no',
             'order_total_tax'           : $('#tax_amount_value').val(),
             'order_include_discount'    : $('#invoice_discount').is(':checked') ? 'yes' : 'no',
@@ -306,6 +307,7 @@ jQuery(document).ready(function ($) {
                 'quantity'          : parseInputValue($(this).find('.custom_product_amount').val()),
                 'net_price'         : parseInputValue($(this).find('.custom_product_price').val()),
                 'total_price'       : $(this).find('.custom_product_total').val(),
+                'date_time'         : $('#current-date-time').val(),
                 'sale_return_flag'  : 'sold' // Flag indicating the product is sold
             };
             formData.products.push(productData);
@@ -318,6 +320,7 @@ jQuery(document).ready(function ($) {
                     'quantity'          : parseInputValue($(this).find('.custom_product_amount').val()),
                     'net_price'         : parseInputValue($(this).find('.custom_product_price').val()),
                     'total_price'       : parseInputValue($(this).find('.custom_product_total').val()),
+                    'date_time'         : $('#current-date-time').val(),
                     'sale_return_flag'  : 'returned' // Flag indicating the product is returned
                 };
                 formData.products.push(returnedProductData);
@@ -329,7 +332,7 @@ jQuery(document).ready(function ($) {
                 console.log(response.data.message);
                 console.log(formData);
                 // Redirect or handle success response
-                window.location.href = response.data.redirect_url;
+                // window.location.href = response.data.redirect_url;
             } else {
                 console.log('Error: ' + response.data.message);
             }

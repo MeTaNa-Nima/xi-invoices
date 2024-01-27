@@ -14,6 +14,7 @@ require_once plugin_dir_path(__FILE__) . 'includes/database/db-functions.php';
 // OOP STARTED:
 require_once plugin_dir_path( __FILE__ ) . 'includes/classes/class-xi-invoices-customers.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/classes/class-xi-invoices-products.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/classes/class-xi-invoices-invoices.php';
 
 
 

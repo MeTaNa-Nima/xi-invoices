@@ -1,46 +1,47 @@
 <?php
-// File: includes/invoices/class-xi-invoices-invoices.php
-
-class Xi_Invoices_Invoices {
+class Xi_Invoices_Invoice {
     private $wpdb;
-    private $table_name;
+    private $operation_data_table;
+    private $data_lookup_table;
 
     public function __construct() {
         global $wpdb;
         $this->wpdb = $wpdb;
-        $this->table_name = $this->wpdb->prefix . 'x_invoice_invoices';
+        $this->operation_data_table = $wpdb->prefix . 'x_invoice_operation_data';
+        $this->data_lookup_table = $wpdb->prefix . 'x_invoice_data_lookup';
     }
-    
-    
-    /* */
-    
-    
-    // Add a new invoice
+
     public function add_invoice($data) {
-        return $this->wpdb->insert($this->table_name, $data);
+        if ($this->wpdb->insert($this->operation_data_table, $data)) {
+            return $this->wpdb->insert_id;
+        }
+        return false;
     }
 
-    // Update an existing invoice
-    public function update_invoice($invoice_id, $data) {
-        return $this->wpdb->update($this->table_name, $data, array('invoice_id' => $invoice_id));
+    // Method to get the ID of the last inserted invoice
+    public function get_last_inserted_invoice_id() {
+        $query = "SELECT invoice_id FROM {$this->operation_data_table} ORDER BY invoice_id DESC LIMIT 1";
+        $result = $this->wpdb->get_row($query);
+        return $result ? $result->invoice_id : null;
     }
 
-    // Retrieve a invoice by ID
-    public function get_invoice($invoice_id) {
-        return $this->wpdb->get_row($this->wpdb->prepare("SELECT * FROM $this->table_name WHERE invoice_id = %d", $invoice_id));
-    }
-    public function get_invoice_by_national_id($national_id) {
-        return $this->wpdb->get_row($this->wpdb->prepare("SELECT * FROM $this->table_name WHERE invoice_national_id = %s", $national_id));
+    public function add_product_details($invoice_id, $product_details) {
+        foreach ($product_details as $product) {
+            $product['order_id'] = $invoice_id;
+            $this->wpdb->insert($this->data_lookup_table, $product);
+            
+        }
     }
 
-    // Retrieve all invoices
-    public function get_all_invoices() {
-        return $this->wpdb->get_results("SELECT * FROM $this->table_name");
+    public function add_product_details_debug($product_details) {
+        $this->wpdb->insert($this->data_lookup_table, $product_details);
     }
-    
 
-    // Delete a invoice
-    public function delete_invoice($invoice_id) {
-        return $this->wpdb->delete($this->table_name, array('invoice_id' => $invoice_id));
+    public function update_order_id($invoice_id) {
+        return $this->wpdb->update(
+            $this->operation_data_table,
+            array('order_id' => $invoice_id),
+            array('invoice_id' => $invoice_id)
+        );
     }
 }
