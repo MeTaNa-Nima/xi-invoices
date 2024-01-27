@@ -40,7 +40,7 @@ function x_invoice_shortcode()
 
 
 ?>
-    <h3 class="current-date">تاریخ امروز: <?php echo $current_date_time; ?></h3>
+    <h3 class="xi-current-date">تاریخ امروز: <?php echo $current_date_time; ?></h3>
     <form id="x-invoice" class="x-invoice" action="" method="post">
         <h2 class="x-invoice-title"></h2>
         <div class="x-invoice-form-inputs">
@@ -50,7 +50,6 @@ function x_invoice_shortcode()
                         <th>کاربر</th>
                         <th>نام مشتری</th>
                         <th>نام فروشگاه</th>
-                        <th>آدرس</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -74,7 +73,10 @@ function x_invoice_shortcode()
                             <input type="hidden" class="this_customer_id" name="this_customer_id" value="">
                         </td>
                         <td class="x_invoice_top_td"><input class="customer_shop_name" readonly type="" value=""></td>
-                        <td class="x_invoice_top_td"><input class="customer_national_address" readonly type="" value=""></td>
+                    </tr>
+                    <tr>
+                        <td colspan="1">آدرس مشتری:</td>
+                        <td colspan="2" class="x_invoice_top_td"><input class="customer_address" readonly type="" value=""></td>
                     </tr>
                 </tbody>
             </table>
@@ -202,7 +204,7 @@ function x_invoice_shortcode()
                 <div class="payment_tax">
                     <div class="includes_tax">
                         <input type="checkbox" name="invoice_includes_tax" id="invoice_includes_tax" class="invoice_includes_tax">
-                        <label for="invoice_includes_tax">مشمول مالیت شود؟</label>
+                        <label for="invoice_includes_tax">مشمول مالیات شود؟</label>
                     </div>
                     <div class="tax_amounts" style="display: none;">
                         <label for="tax_amount">درصد مالیات معادل:</label>
@@ -238,7 +240,8 @@ function x_invoice_shortcode()
             if (customerId == -1) {
                 // Reset the fields if no customer is selected
                 jQuery('.customer_shop_name').val('');
-                jQuery('.customer_national_address').val('');
+                jQuery('.customer_address').val('');
+                jQuery('.customer_national_id').val('');
                 return;
             }
             jQuery.ajax({
@@ -251,8 +254,9 @@ function x_invoice_shortcode()
                 success: function(response) {
                     if (response) {
                         var data = JSON.parse(response);
-                        jQuery('.customer_shop_name').val(data.national_id);
-                        jQuery('.customer_national_address').val(data.address);
+                        jQuery('.customer_shop_name').val(data.shop_name);
+                        jQuery('.customer_address').val(data.address);
+                        jQuery('.customer_national_id').val(data.national_id);
                     }
                 }
             });
@@ -352,9 +356,9 @@ function get_customer_details()
         $table_name = $wpdb->prefix . 'x_invoice_customers';
         $customer = $wpdb->get_row("SELECT * FROM $table_name WHERE customer_id = $customer_id", ARRAY_A);
         if ($customer) {
-            echo json_encode(array('national_id' => $customer['customer_shop_name'], 'address' => $customer['customer_address']));
+            echo json_encode(array('national_id' => $customer['national_id'], 'address' => $customer['customer_address'], 'shop_name' => $customer['customer_shop_name']));
         } else {
-            echo json_encode(array('national_id' => '', 'address' => ''));
+            echo json_encode(array('national_id' => '', 'address' => '', 'shop_name' => ''));
         }
     }
     wp_die();

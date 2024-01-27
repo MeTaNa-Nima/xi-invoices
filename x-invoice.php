@@ -2,15 +2,18 @@
 /*
 Plugin Name: X-Invoice
 Description: This is a Invoice WordPress plugin.
-Version: 1.0.0
+Version: 1.0.1
 Author: Nima Amani <metananima@gmail.com>
 */
-define('X_INVOICE_VERSION', '1.0.0');
+define('X_INVOICE_VERSION', '1.0.1');
 define('X_INVOICE_PLUGIN_URL', plugin_dir_url(__FILE__));
 require_once plugin_dir_path(__FILE__) . 'includes/database/db-functions.php';
 
 
 
+// OOP STARTED:
+require_once plugin_dir_path( __FILE__ ) . 'includes/classes/class-xi-invoices-customers.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/classes/class-xi-invoices-products.php';
 
 
 

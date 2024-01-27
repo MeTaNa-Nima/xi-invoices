@@ -1,9 +1,3 @@
--  pdf dar site zaxire shavad
--  Reports Page Back-End Editable (!?)
--  OOP
-
-
-
 <?php
 // File: includes/customers/class-xi-invoices-customers.php
 
@@ -31,38 +25,18 @@ class Xi_Invoices_Customers {
     public function get_customer($customer_id) {
         return $this->wpdb->get_row($this->wpdb->prepare("SELECT * FROM $this->table_name WHERE customer_id = %d", $customer_id));
     }
+    public function get_customer_by_national_id($national_id) {
+        return $this->wpdb->get_row($this->wpdb->prepare("SELECT * FROM $this->table_name WHERE customer_national_id = %s", $national_id));
+    }
 
     // Retrieve all customers
     public function get_all_customers() {
         return $this->wpdb->get_results("SELECT * FROM $this->table_name");
     }
+    
 
     // Delete a customer
     public function delete_customer($customer_id) {
         return $this->wpdb->delete($this->table_name, array('customer_id' => $customer_id));
     }
 }
-
-
-////////////////////////// USAGE EXAMPLE:
-
-$customers = new Xi_Invoices_Customers();
-
-// Add a new customer
-$customers->add_customer(array(
-    'customer_name' => 'John Doe',
-    'customer_national_id' => '123456789',
-    'customer_address' => '123 Main St',
-    'customer_shop_name' => 'John's Shop'
-));
-
-// Get a customer
-$customer = $customers->get_customer(1);
-
-// Update a customer
-$customers->update_customer(1, array('customer_address' => '456 Elm St'));
-
-// Delete a customer
-$customers->delete_customer(1);
-
-

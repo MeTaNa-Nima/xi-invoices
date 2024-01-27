@@ -19,11 +19,13 @@ body, input, select, h1, h2, h3, h4, h5, h6, p {
 .x-invoice-form-inputs .x_invoice_table_td input,
 .x-invoice-form-inputs .x_invoice_top_td select,
 .x-invoice-form-inputs .x_invoice_table_td select {
-	width: 80%;
+	width: calc(100% - 2em);
 }
 
 /* View Invoice Page Start */
-
+.xi-current-date {
+	text-align: center;
+}
 .xi-invoice-view-form-controls {
 	display: flex;
 	gap: 1em;
