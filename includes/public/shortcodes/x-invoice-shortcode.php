@@ -12,20 +12,27 @@ function x_invoice_shortcode()
 {
     global $wpdb;
 
-    $taxAmount              = get_option('taxAmount', 'applied-tax');
-    $dateFormat             = get_option('dateFormat',    'date_format');
+    $products           = new Xi_Invoices_Products();
+    $customers          = new Xi_Invoices_Customers();
 
-    $current_user = wp_get_current_user();
-    $user_id = $current_user->ID;
-    $user_display_name = $current_user->display_name;
+
+    $products_data      = $products->get_all_products();
+    $customers_data     = $customers->get_all_customers();
+
+
+    $taxAmount          = get_option('taxAmount', 'applied-tax');
+    $dateFormat         = get_option('dateFormat', 'date_format');
+    $current_user       = wp_get_current_user();
+    $user_id            = $current_user->ID;
+    $user_display_name  = $current_user->display_name;
 
     ob_start();
     if ($dateFormat == 'jalali') {
         $today = jdate('Y/n/j');
-        $current_date_time = jdate('Y/n/j');
+        $current_date_time = jdate('Y/n/j H:i');
     } else {
         $today = date('Y/n/j');
-        $current_date_time = date('Y/n/j');
+        $current_date_time = date('Y/n/j H:i');
     }
     
 
@@ -33,14 +40,16 @@ function x_invoice_shortcode()
     $products_table_name    = $wpdb->prefix . 'x_invoice_products';
     $operations_table_name  = $wpdb->prefix . 'x_invoice_operation_data';
     $data_lookup_table_name = $wpdb->prefix . 'x_invoice_data_lookup';
-    $customers_data         = $wpdb->get_results("SELECT * FROM $customers_table_name", ARRAY_A);
-    $products_data          = $wpdb->get_results("SELECT * FROM $products_table_name", ARRAY_A);
+    
+    // $customers_data         = $wpdb->get_results("SELECT * FROM $customers_table_name", ARRAY_A);
+    // $products_data          = $wpdb->get_results("SELECT * FROM $products_table_name", ARRAY_A);
+    
     $operations_data        = $wpdb->get_results("SELECT * FROM $operations_table_name", ARRAY_A);
     $data_lookup_data       = $wpdb->get_results("SELECT * FROM $data_lookup_table_name", ARRAY_A);
 
 
 ?>
-    <h3 class="xi-current-date">تاریخ امروز: <?php echo $current_date_time; ?></h3>
+    <h3 class="xi-current-date">تاریخ امروز: <?php echo $today; ?></h3>
     <form id="x-invoice" class="x-invoice" action="" method="post">
         <h2 class="x-invoice-title"></h2>
         <div class="x-invoice-form-inputs">
@@ -57,7 +66,7 @@ function x_invoice_shortcode()
                         <td class="x_invoice_top_td">
                             <input class="current_user" readonly type="" value="<?php echo $user_display_name; ?>">
                             <input type="hidden" name="" value="<?php echo $user_id; ?>">
-                            <input type="hidden" readonly class="current-date-time" name="current-date-time" value="<?php echo $current_date_time; ?>">
+                            <input type="hidden" readonly class="current-date-time" name="current-date-time" value="<?php echo $today; ?>">
                         </td>
                         <td class="x_invoice_top_td">
                             <select name="customer_name" class="customer_name" id="customer_name" onChange="fetchCustomerDetails(this.value)">
@@ -65,7 +74,7 @@ function x_invoice_shortcode()
                                 <?php
                                 foreach ($customers_data as $data) {
                                 ?>
-                                    <option value="<?php echo esc_attr($data['customer_id']); ?>"><?php echo esc_attr($data['customer_name']); ?></option>
+                                    <option value="<?php echo esc_attr($data->customer_id); ?>"><?php echo esc_attr($data->customer_name); ?></option>
                                 <?php
                                 };
                                 ?>
@@ -97,7 +106,7 @@ function x_invoice_shortcode()
                                 <?php
                                 foreach ($products_data as $data) {
                                 ?>
-                                    <option value="<?php echo esc_attr($data['product_id']); ?>"><?php echo esc_attr($data['product_name']); ?></option>
+                                    <option value="<?php echo esc_attr($data->product_id); ?>"><?php echo esc_attr($data->product_name); ?></option>
                                 <?php
                                 };
                                 ?>
@@ -145,7 +154,7 @@ function x_invoice_shortcode()
                                     <?php
                                     foreach ($products_data as $data) {
                                     ?>
-                                        <option value="<?php echo esc_attr($data['product_id']); ?>"><?php echo esc_attr($data['product_name']); ?></option>
+                                        <option value="<?php echo esc_attr($data->product_id); ?>"><?php echo esc_attr($data->product_name); ?></option>
                                     <?php
                                     };
                                     ?>
@@ -283,7 +292,7 @@ function x_invoice_ajax_submit_invoice()
     $payment_method             = sanitize_text_field($_POST['payment_method']);
     $order_total_pure           = sanitize_text_field($_POST['order_total_pure']);
     $order_total_final          = sanitize_text_field($_POST['order_total_final']);
-    $visitor_id                 = get_current_user_id(); // Current logged-in user ID
+    $visitor_id                 = get_current_user_id();
     $include_returned_products  = sanitize_text_field($_POST['include_returned_products']);
 
     // Insert data into invoice_operation_data
@@ -350,13 +359,12 @@ function x_invoice_ajax_submit_invoice()
 // Getting and Updating Customers Data
 function get_customer_details()
 {
-    global $wpdb;
+    $customers = new Xi_Invoices_Customers();
     $customer_id = isset($_POST['customer_id']) ? intval($_POST['customer_id']) : 0;
     if ($customer_id > 0) {
-        $table_name = $wpdb->prefix . 'x_invoice_customers';
-        $customer = $wpdb->get_row("SELECT * FROM $table_name WHERE customer_id = $customer_id", ARRAY_A);
+        $customer = $customers->get_customer($customer_id);
         if ($customer) {
-            echo json_encode(array('national_id' => $customer['national_id'], 'address' => $customer['customer_address'], 'shop_name' => $customer['customer_shop_name']));
+            echo json_encode(array('national_id' => $customer->customer_national_id , 'address' => $customer->customer_address, 'shop_name' => $customer->customer_shop_name));
         } else {
             echo json_encode(array('national_id' => '', 'address' => '', 'shop_name' => ''));
         }

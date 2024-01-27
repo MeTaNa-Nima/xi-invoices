@@ -8,7 +8,6 @@ function x_reports_page()
         <a href="?page=xi-reports&report-type=products" class="button-secondary">گزارش فروش محصولات</a>
         <a href="?page=xi-reports&report-type=visitors" class="button-secondary">گزارش فروش ویزیتور ها</a>
         <a href="?page=xi-reports&report-type=customers" class="button-secondary">گزارش فروش مشتری ها</a>
-        <!-- <a href="?page=xi-reports&report-type=city" class="button-secondary">گزارش فروش شهر</a> -->
     </div>
     <div class="reports-section">
         <?php
@@ -30,10 +29,6 @@ function x_reports_page()
             case 'customers';
                 report_by_customers();
                 break;
-
-                // case 'city';
-                //     report_by_city();
-                //     break;
 
             default:
                 default_reports_page();
@@ -108,7 +103,6 @@ function report_by_visitors()
             <th scope="row">نام ویزیتور</th>
             <th scope="row">بیشترین فروش به مشتری</th>
             <th scope="row">محصول پر فروش</th>
-            <!-- <th scope="row">شهر پر فروش</th> -->
             <th scope="row">بزرگترین فروش</th>
             <th scope="row">بیشترین روش پرداخت</th>
             <th scope="row">کل تخفیفات</th>
@@ -223,7 +217,6 @@ function report_by_visitors()
                     <td scope="row" class=""><?php echo esc_html($visitor->display_name); ?></td>
                     <td scope="row" class=""><?php echo esc_html($topCustomerName); ?></td>
                     <td scope="row" class=""><?php echo esc_html($topProductName); ?>: (<?php echo esc_html($topProductQty); ?>)</td>
-                    <!-- <td scope="row" class=""><?php echo esc_html($topCity); ?></td> -->
                     <td scope="row" class=""><a href="<?php echo esc_url($linkToTopSale); ?>"><?php echo number_format($topSale); ?></a></td>
                     <td scope="row" class=""><?php echo esc_html($topPaymentMethod); ?></td>
                     <td scope="row" class=""><?php echo number_format($totalDiscount); ?></td>
