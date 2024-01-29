@@ -33,6 +33,7 @@ class Xi_Invoices_Reports {
 
     public function getReportDataByVisitor($visitor_id)
     {
+        // Top Customer Detail
         $top_customer_query = $this->wpdb->prepare(
             "SELECT c.customer_name, COUNT(*) as total_orders
             FROM $this->operation_data_table op
@@ -46,139 +47,12 @@ class Xi_Invoices_Reports {
         $top_customer = $this->wpdb->get_row($top_customer_query);
         $topCustomerName = $top_customer ? $top_customer->customer_name : 'Unknown';
 
-        // Get top product and quantity for this visitor
-        $top_product_query = $this->wpdb->prepare(
-            "SELECT p.product_name, SUM(dl.product_qty) as total_qty
-            FROM $this->data_lookup_table dl
-            JOIN $this->products_table p ON dl.product_id = p.product_id
-            JOIN $this->operation_data_table op ON dl.order_id = op.invoice_id
-            WHERE op.visitor_id = %d
-            GROUP BY dl.product_id
-            ORDER BY total_qty DESC
-            LIMIT 1",
-            $visitor_id
-        );
-        $top_product = $this->wpdb->get_row($top_product_query);
-        $topProductName = $top_product ? $top_product->product_name : 'Unknown';
-        $topProductQty = $top_product ? $top_product->total_qty : 0;
-
-
-        // Get top sale (highest order_total_final) for this visitor
-        $top_sale_query = $this->wpdb->prepare(
-            "SELECT MAX(op.order_total_final) as top_sale, op.invoice_id
-            FROM $this->operation_data_table op
-            WHERE op.visitor_id = %d
-            GROUP BY op.visitor_id",
-            $visitor_id
-        );
-        $top_sale = $this->wpdb->get_row($top_sale_query);
-        $topSale = $top_sale ? $top_sale->top_sale : 0;
-        $linkToTopSale = $top_sale ? admin_url('admin.php?page=xi-orders-list&invoice_id=' . $top_sale->invoice_id) : '#';
-
-        // Get mostly used payment method for this visitor
-        $top_payment_method_query = $this->wpdb->prepare(
-            "SELECT op.payment_method, COUNT(*) as total
-            FROM $this->operation_data_table op
-            WHERE op.visitor_id = %d
-            GROUP BY op.payment_method
-            ORDER BY total DESC
-            LIMIT 1",
-            $visitor_id
-        );
-        $top_payment_method = $this->wpdb->get_row($top_payment_method_query);
-        $topPaymentMethod = $top_payment_method ? $top_payment_method->payment_method : 'Unknown';
-
-        // Get total discount given by this visitor
-        $total_discount_query = $this->wpdb->prepare(
-            "SELECT SUM(op.discount_total_amount) as total_discount
-            FROM $this->operation_data_table op
-            WHERE op.visitor_id = %d",
-            $visitor_id
-        );
-        $totalDiscount = $this->wpdb->get_var($total_discount_query);
-
-        // Get total pure sales for this visitor
-        $total_pure_sales_query = $this->wpdb->prepare(
-            "SELECT SUM(op.order_total_pure) as total_pure_sales
-            FROM $this->operation_data_table op
-            WHERE op.visitor_id = %d",
-            $visitor_id
-        );
-        $totalPureSales = $this->wpdb->get_var($total_pure_sales_query);
-
-        // Get total sales (order_total_final) for this visitor
-        $total_sales_query = $this->wpdb->prepare(
-            "SELECT SUM(op.order_total_final) as total_sales
-            FROM $this->operation_data_table op
-            WHERE op.visitor_id = %d",
-            $visitor_id
-        );
-        $totalSales = $this->wpdb->get_var($total_sales_query);
-
         return [
             'topCustomerName'   => $topCustomerName,
-            'topProductName'    => $topProductName,
-            'topProductQty'     => $topProductQty,
-            'topSale'           => $topSale,
-            'linkToTopSale'     => $linkToTopSale,
-            'topPaymentMethod'  => $topPaymentMethod,
-            'totalDiscount'     => $totalDiscount,
-            'totalPureSales'    => $totalPureSales,
-            'totalSales'        => $totalSales
         ];
     }
 
     public function getReportDataByCustomer($customer_id) {
-        // Get biggest buy by price and link to invoice
-        $biggest_buy_query = $this->wpdb->prepare(
-            "SELECT op.invoice_id, MAX(op.order_total_final) as biggest_buy
-            FROM $this->operation_data_table op
-            WHERE op.customer_id = %d
-            GROUP BY op.customer_id",
-            $customer_id
-        );
-        $biggest_buy = $this->wpdb->get_row($biggest_buy_query);
-        $biggestBuyPrice = $biggest_buy ? $biggest_buy->biggest_buy : 0;
-        $linkToInvoice = $biggest_buy ? admin_url('admin.php?page=xi-orders-list&invoice_id=' . $biggest_buy->invoice_id) : '#';
-
-        // Get most product bought
-        $top_product_query = $this->wpdb->prepare(
-            "SELECT p.product_name, SUM(dl.product_qty) as total_qty
-            FROM $this->data_lookup_table dl
-            JOIN $this->products_table p ON dl.product_id = p.product_id
-            JOIN $this->operation_data_table op ON dl.order_id = op.invoice_id
-            WHERE op.customer_id = %d
-            GROUP BY dl.product_id
-            ORDER BY total_qty DESC
-            LIMIT 1",
-            $customer_id
-        );
-        $top_product = $this->wpdb->get_row($top_product_query);
-        $mostProductBought = $top_product ? $top_product->product_name : 'Unknown';
-        $topProductQty = $top_product ? $top_product->total_qty : 0;
-
-        // Get most used payment method
-        $most_payment_method_query = $this->wpdb->prepare(
-            "SELECT op.payment_method, COUNT(*) as total
-            FROM $this->operation_data_table op
-            WHERE op.customer_id = %d
-            GROUP BY op.payment_method
-            ORDER BY total DESC
-            LIMIT 1",
-            $customer_id
-        );
-        $most_payment_method = $this->wpdb->get_row($most_payment_method_query);
-        $mostPaymentMethod = $most_payment_method ? $most_payment_method->payment_method : 'Unknown';
-
-        // Get total discount given to this customer
-        $total_discount_query = $this->wpdb->prepare(
-            "SELECT SUM(op.discount_total_amount) as total_discount
-            FROM $this->operation_data_table op
-            WHERE op.customer_id = %d",
-            $customer_id
-        );
-        $totalDiscount = $this->wpdb->get_var($total_discount_query);
-
         // Get which visitor sold him the most by price
         $top_visitor_by_price_query = $this->wpdb->prepare(
             "SELECT op.visitor_id, SUM(op.order_total_final) as total_sales
@@ -207,27 +81,113 @@ class Xi_Invoices_Reports {
         $top_visitor_by_items = $this->wpdb->get_row($top_visitor_by_items_query);
         $topVisitorByItems = $top_visitor_by_items ? get_user_by('id', $top_visitor_by_items->visitor_id)->display_name . ' (' . $top_visitor_by_items->total_items . ' قلم)' : 'Unknown';
 
-        // Get total Sales by this customer
-        $total_sale_query = $this->wpdb->prepare(
-            "SELECT SUM(op.order_total_final) as total_sale
-            FROM $this->operation_data_table op
-            WHERE op.customer_id = %d",
-            $customer_id
-        );
-        $totalSale = $this->wpdb->get_var($total_sale_query);
 
         return [
-            'biggestBuyPrice'   =>$biggestBuyPrice,
-            'linkToInvoice'     =>$linkToInvoice,
-            'mostProductBought' =>$mostProductBought,
-            'topProductQty'     =>$topProductQty,
-            'mostPaymentMethod' =>$mostPaymentMethod,
-            'totalDiscount'     =>$totalDiscount,
             'topVisitorByPrice' =>$topVisitorByPrice,
             'topVisitorByItems' =>$topVisitorByItems,
-            'totalSale'         =>$totalSale
         ];
     }
+
+    public function getTotalDiscount($entity_id, $by = 'visitor') {
+        $column = $by === 'visitor' ? 'visitor_id' : 'customer_id';
+        $total_discount_query = $this->wpdb->prepare(
+            "SELECT SUM(op.discount_total_amount) as total_discount
+            FROM $this->operation_data_table op
+            WHERE op.$column = %d",
+            $entity_id
+        );
+        return $this->wpdb->get_var($total_discount_query);
+    }
+
+    public function getMostPaymentMethod($entity_id, $by = 'visitor') {
+        $column = $by === 'visitor' ? 'visitor_id' : 'customer_id';
+        $top_payment_method_query = $this->wpdb->prepare(
+            "SELECT op.payment_method, COUNT(*) as total
+            FROM $this->operation_data_table op
+            WHERE op.$column = %d
+            GROUP BY op.payment_method
+            ORDER BY total DESC
+            LIMIT 1",
+            $entity_id
+        );
+        $top_payment_method = $this->wpdb->get_row($top_payment_method_query);
+        return $top_payment_method ? $top_payment_method->payment_method : 'Unknown';
+    }
+
+    public function getTotalSaleFinal($entity_id, $by = 'visitor') {
+        $column = $by === 'visitor' ? 'visitor_id' : 'customer_id';
+        $total_sales_query = $this->wpdb->prepare(
+            "SELECT SUM(op.order_total_final) as total_sales
+            FROM $this->operation_data_table op
+            WHERE op.$column = %d",
+            $entity_id
+        );
+        return $this->wpdb->get_var($total_sales_query);
+    }
+
+    public function getTotalSalePure($entity_id, $by = 'visitor') {
+        $column = $by === 'visitor' ? 'visitor_id' : 'customer_id';
+        $total_pure_sales_query = $this->wpdb->prepare(
+            "SELECT SUM(op.order_total_pure) as total_pure_sales
+            FROM $this->operation_data_table op
+            WHERE op.$column = %d",
+            $entity_id
+        );
+        return $this->wpdb->get_var($total_pure_sales_query);
+    }
+
+    public function getTopSaleDetails($entity_id, $by = 'visitor') {
+        $column = $by === 'visitor' ? 'visitor_id' : 'customer_id';
+        $biggest_buy_query = $this->wpdb->prepare(
+            "SELECT op.invoice_id, MAX(op.order_total_final) as biggest_sale
+            FROM $this->operation_data_table op
+            WHERE op.$column = %d
+            GROUP BY op.$column",
+            $entity_id
+        );
+        $biggest_sale = $this->wpdb->get_row($biggest_buy_query);
+        if ($biggest_sale) {
+            $linkToInvoice = admin_url('admin.php?page=xi-orders-list&invoice_id=' . $biggest_sale->invoice_id);
+            return [
+                'amount'    => $biggest_sale->biggest_sale,
+                'url'       => $linkToInvoice,
+                'id'        => $biggest_sale->invoice_id
+            ];
+        }
+        return null;
+    }
+
+
+    public function getTopProductSold($entity_id, $by = 'visitor') {
+        $column = $by === 'visitor' ? 'visitor_id' : 'customer_id';
+        $top_product_query = $this->wpdb->prepare(
+            "SELECT p.product_name, SUM(dl.product_qty) as total_qty
+            FROM $this->data_lookup_table dl
+            JOIN $this->products_table p ON dl.product_id = p.product_id
+            JOIN $this->operation_data_table op ON dl.order_id = op.invoice_id
+            WHERE op.$column = %d
+            GROUP BY dl.product_id
+            ORDER BY total_qty DESC
+            LIMIT 1",
+            $entity_id
+        );
+        $top_product = $this->wpdb->get_row($top_product_query);
+        if ($top_product) {
+            return [
+                'name' => $top_product->product_name,
+                'quantity' => $top_product->total_qty
+            ];
+        }
+    
+        return ['name' => 'Unknown',
+                'quantity' => 0
+        ];
+    }
+
+    
+
+
+
 
     
 }

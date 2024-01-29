@@ -99,21 +99,27 @@ function report_by_visitors()
         if (!empty($visitors)) {
             foreach ($visitors as $visitor) {
 
-                $visitor_id = $visitor->ID;
-                $reports = new Xi_Invoices_Reports();
-                $report = $reports->getReportDataByVisitor($visitor_id);
+                $visitor_id         = $visitor->ID;
+                $reports            = new Xi_Invoices_Reports();
+                $report             = $reports->getReportDataByVisitor($visitor_id);
+                $totalDiscount      = $reports->getTotalDiscount($visitor_id, 'visitor');
+                $mostPaymentMethod  = $reports->getMostPaymentMethod($visitor_id, 'visitor');
+                $totalSaleFinal     = $reports->getTotalSaleFinal($visitor_id, 'visitor');
+                $totalSalePure      = $reports->getTotalSalePure($visitor_id, 'visitor');
+                $topSaleDetails     = $reports->getTopSaleDetails($visitor_id, 'visitor');
+                $topProductSold     = $reports->getTopProductSold($visitor_id, 'visitor');
 
 
         ?>
                 <tr valign="top">
                     <td scope="row" class=""><?php echo esc_html($visitor->display_name); ?></td>
                     <td scope="row" class=""><?php echo esc_html($report['topCustomerName']); ?></td>
-                    <td scope="row" class=""><?php echo esc_html($report['topProductName']); ?>: (<?php echo esc_html($report['topProductQty']); ?>)</td>
-                    <td scope="row" class=""><a href="<?php echo esc_url($report['linkToTopSale']); ?>"><?php echo number_format($report['topSale']); ?></a></td>
-                    <td scope="row" class=""><?php echo esc_html($report['topPaymentMethod']); ?></td>
-                    <td scope="row" class=""><?php echo number_format($report['totalDiscount']); ?></td>
-                    <td scope="row" class=""><?php echo number_format($report['totalPureSales']); ?></td>
-                    <td scope="row" class=""><?php echo number_format($report['totalSales']); ?></td>
+                    <td scope="row" class=""><?php echo esc_html($topProductSold['name']); ?>: (<?php echo esc_html($topProductSold['quantity']); ?>)</td>
+                    <td scope="row" class=""><a href="<?php echo esc_url($topSaleDetails['url']); ?>"><?php echo number_format($topSaleDetails['amount']); ?></a></td>
+                    <td scope="row" class=""><?php echo esc_html($mostPaymentMethod); ?></td>
+                    <td scope="row" class=""><?php echo number_format($totalDiscount); ?></td>
+                    <td scope="row" class=""><?php echo number_format($totalSalePure); ?></td>
+                    <td scope="row" class=""><?php echo number_format($totalSaleFinal); ?></td>
                 </tr>
             <?php
             }
@@ -130,11 +136,6 @@ function report_by_visitors()
     // Customer Report Start
     function report_by_customers()
     {
-        global $wpdb;
-        $operation_table = $wpdb->prefix . 'x_invoice_operation_data';
-        $lookup_table = $wpdb->prefix . 'x_invoice_data_lookup';
-        $products_table = $wpdb->prefix . 'x_invoice_products';
-
         // Get all customers
         $customers = new Xi_Invoices_Customers();
         $allCustomers = $customers->get_all_customers();
@@ -153,21 +154,28 @@ function report_by_visitors()
     </tr>
     <?php
         foreach ($allCustomers as $customer) {
-            $customer_id = $customer->customer_id;
-            $reports = new Xi_Invoices_Reports();
-            $report = $reports->getReportDataByCustomer($customer_id);
+            $customer_id        = $customer->customer_id;
+            $reports            = new Xi_Invoices_Reports();
+            $report             = $reports->getReportDataByCustomer($customer_id);
+            $totalDiscount      = $reports->getTotalDiscount($customer_id, 'customer');
+            $mostPaymentMethod  = $reports->getMostPaymentMethod($customer_id, 'customer');
+            $totalFinalSale     = $reports->getTotalSaleFinal($customer_id, 'customer');
+            $topSaleDetails     = $reports->getTopSaleDetails($customer_id, 'customer');
+            $topProductSold     = $reports->getTopProductSold($customer_id, 'customer');
+
+
 
             // Display the data
     ?>
         <tr valign="top">
             <td scope="row" class=""><?php echo esc_html($customer->customer_name); ?></td>
-            <td scope="row" class=""><a href="<?php echo esc_url($report['linkToInvoice']); ?>"><?php echo number_format($report['biggestBuyPrice']); ?></a></td>
-            <td scope="row" class=""><?php echo esc_html($report['mostProductBought']); ?></td>
-            <td scope="row" class=""><?php echo esc_html($report['mostPaymentMethod']); ?></td>
-            <td scope="row" class=""><?php echo esc_html(number_format($report['totalDiscount'])); ?></td>
+            <td scope="row" class=""><a href="<?php echo esc_url($topSaleDetails['url']); ?>"><?php echo number_format($topSaleDetails['amount']); ?></a></td>
+            <td scope="row" class=""><?php echo esc_html($topProductSold['name']); ?></td>
+            <td scope="row" class=""><?php echo esc_html($mostPaymentMethod); ?></td>
+            <td scope="row" class=""><?php echo esc_html(number_format($totalDiscount)); ?></td>
             <td scope="row" class=""><?php echo esc_html($report['topVisitorByPrice']); ?></td>
             <td scope="row" class=""><?php echo esc_html($report['topVisitorByItems']); ?></td>
-            <td scope="row" class=""><?php echo esc_html(number_format($report['totalSale'])); ?></td>
+            <td scope="row" class=""><?php echo esc_html(number_format($totalFinalSale)); ?></td>
         </tr>
     <?php
         }
