@@ -13,6 +13,16 @@ function showMessage()
     echo $errorMessage;
 }
 
+// Get Current Site Logo
+function get_site_logo_url() {
+    $custom_logo_id = get_theme_mod('custom_logo');
+    if ($custom_logo_id) {
+        $image = wp_get_attachment_image_src($custom_logo_id, 'full');
+        return $image[0];
+    }
+    return '';
+}
+
 function x_invoice_hide_admin_footer()
 {
     // Get the current screen information

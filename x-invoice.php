@@ -28,11 +28,15 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/public/shortcodes/x-invoice
 require_once plugin_dir_path( __FILE__ ) . 'includes/admin/add-customers-data.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/admin/edit-customers-data.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/admin/edit-products-data.php';
-require_once plugin_dir_path( __FILE__ ) . 'includes/admin/orders_list.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/admin/reports.php';
 
-// require_once plugin_dir_path( __FILE__ ) . '';
-// require_once plugin_dir_path( __FILE__ ) . '';
+require_once plugin_dir_path( __FILE__ ) . 'includes/admin/invoices.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/admin/invoices-all.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/admin/invoices-single.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/admin/invoices-edit.php';
+
+
+require_once plugin_dir_path( __FILE__ ) . 'includes/admin/orders_list.php';
 
 
 
@@ -107,6 +111,15 @@ function x_invoice_plugin_admin_menu()
         'xi-edit-customer-data',
         'edit_customer_data_page'
     );
+    $xi_edit_customer_data = add_submenu_page(
+        'x-invoice',
+        'all invoices',
+        'all invoices',
+        'manage_options',
+        'xi-invoices',
+        'invoice_actions'
+    );
+
 }
 add_action('admin_menu', 'x_invoice_plugin_admin_menu');
 
@@ -128,6 +141,14 @@ function invoice_main_function()
     echo '</div>';
 }
 
+function invoice_actions()
+{
+    echo '<div class="wrap">';
+    echo '<h1>به افزونه ایکس فاکتور خوش آمدید</h1>';
+    x_invoices_page();
+    echo '</div>';
+}
+
 function invoice_orders_list()
 {
     echo '<div class="wrap">';
@@ -135,6 +156,8 @@ function invoice_orders_list()
     x_invoice_orders_page();
     echo '</div>';
 }
+
+
 function x_reports()
 {
     echo '<div class="wrap">';

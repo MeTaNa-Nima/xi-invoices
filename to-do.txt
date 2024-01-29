@@ -1,11 +1,5 @@
 - pdf dar site zaxire shavad
 - Reports Page Back-End Editable (!?)
-- OOP
--- Customer
--- Visitor
-- Report Logo
 
 
 
-- Problems:
-qeymat ha dar DB , mixoran

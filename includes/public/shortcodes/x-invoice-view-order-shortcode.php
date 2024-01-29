@@ -43,6 +43,20 @@ function x_invoice_view_order_shortcode()
 {
     $invoices = new Xi_Invoices_Invoice();
 
+    // Get the saved logo option
+    $invoiceLogoOption = get_option('invoiceLogo', '');
+
+    // Determine the logo URL
+    $logoURL = '';
+
+    if ($invoiceLogoOption === 'default_site_logo') {
+        // Use WordPress site logo
+        $logoURL = get_site_logo_url(); // Replace with appropriate function to get the site logo URL
+    } else if (!empty($invoiceLogoOption)) {
+        // Use custom logo URL
+        $logoURL = $invoiceLogoOption;
+    }
+
 
     // Check if an invoice number is submitted or fetch the last invoice number
     if (isset($_POST['invoice_number']) && !empty($_POST['invoice_number'])) {
@@ -62,7 +76,7 @@ function x_invoice_view_order_shortcode()
             // Header Start
             $xi_invoice_view_output .= '<div class="xi-invoice-header">';
             // $xi_invoice_view_output .= '<div class="logo">لوگو اینجا میباشد</div>';
-            $xi_invoice_view_output .= '<div class="logo"><img src="' . X_INVOICE_PLUGIN_URL . '/assets/images/july-logo.jpg" alt=""></div>';
+            $xi_invoice_view_output .= '<div class="logo"><img src="' . $logoURL . '" alt=""></div>';
             $xi_invoice_view_output .= '<div class="company-name">شرکت نیک عطرآگین پارس</div>';
             $xi_invoice_view_output .= '<div class="company-registration-number">شماره ثبت ۱۷۲۰۵</div>';
             $xi_invoice_view_output .= '</div>';
