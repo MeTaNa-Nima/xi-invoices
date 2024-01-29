@@ -1,50 +1,11 @@
 <?php
 require_once('settings.php');
 
-function fetch_invoice_details($invoice_id)
-{
-    global $wpdb;
-    $lookup_table = $wpdb->prefix . 'x_invoice_data_lookup';
-    return $wpdb->get_results($wpdb->prepare("SELECT * FROM $lookup_table WHERE order_id = %d", $invoice_id));
-}
-
-function get_customer_details_by_id($customer_id)
-{
-    global $wpdb;
-    $customers_table = $wpdb->prefix . 'x_invoice_customers';
-    $customer = $wpdb->get_row($wpdb->prepare("SELECT customer_name, customer_national_id, customer_address, customer_shop_name FROM $customers_table WHERE customer_id = %d", $customer_id));
-
-    if ($customer) {
-        return array(
-            'name' => $customer->customer_name,
-            'national_id' => $customer->customer_national_id,
-            'address' => $customer->customer_address,
-            'shop_name' => $customer->customer_shop_name
-        );
-    } else {
-        return array(
-            'name' => 'Unknown Customer',
-            'national_id' => 'N/A',
-            'address' => 'N/A',
-            'shop_name' => 'N/A'
-        );
-    }
-}
-
-function get_product_name_by_id($product_id)
-{
-    global $wpdb;
-    $products_table = $wpdb->prefix . 'x_invoice_products';
-    $product = $wpdb->get_row($wpdb->prepare("SELECT product_name FROM $products_table WHERE product_id = %d", $product_id));
-
-    return $product ? $product->product_name : 'Unknown Product';
-}
-
 function x_invoice_orders_page()
 {
-    global $wpdb;
-    $invoice_op_table = $wpdb->prefix . 'x_invoice_operation_data';
-    $invoices = $wpdb->get_results("SELECT * FROM $invoice_op_table");
+    $all_invoices   = new Xi_Invoices_Invoice();
+    $customers      = new Xi_Invoices_Customers();
+    $invoices       = $all_invoices->get_all_invoices();
 
     if (!isset($_GET['invoice_id'])) {
 ?>
@@ -60,9 +21,12 @@ function x_invoice_orders_page()
                 <th>جزییات</th>
             </tr>
             <?php
+
+
             if (!empty($invoices)) {
                 foreach ($invoices as $invoice) {
-                    $customer_details = get_customer_details_by_id($invoice->customer_id);
+                    $customerName = $customers->get_customer($invoice->customer_id)->customer_name;
+
                     $user_info = get_userdata($invoice->visitor_id);
                     $user_name = $user_info ? $user_info->user_login : 'Unknown User';
                     $user_link = $user_info ? admin_url('user-edit.php?user_id=' . $invoice->visitor_id) : '#';
@@ -72,7 +36,7 @@ function x_invoice_orders_page()
                         <td><a href="<?php echo esc_url($user_link); ?>"><?php echo esc_html($user_name); ?></a></td>
                         <td><?php echo esc_html(number_format($invoice->order_total_pure)); ?></td>
                         <td><?php echo esc_html(number_format($invoice->order_total_final)); ?></td>
-                        <td><?php echo esc_html($customer_details['name']); ?></td>
+                        <td><?php echo esc_html($customerName); ?></td>
                         <td><?php echo esc_html($invoice->date_submit_gmt); ?></td>
                         <td><a href="<?php echo admin_url('admin.php?page=xi-orders-list&invoice_id=' . esc_attr($invoice->invoice_id)); ?>">مشاهده فاکتور</a></td>
                     </tr>
@@ -83,13 +47,16 @@ function x_invoice_orders_page()
         </table>
     <?php
     } elseif (isset($_GET['invoice_id']) && is_numeric($_GET['invoice_id'])) {
-        $invoice_id = intval($_GET['invoice_id']);
-        $invoice_details = fetch_invoice_details($invoice_id);
-        $invoice_general_data = $wpdb->get_row($wpdb->prepare("SELECT * FROM $invoice_op_table WHERE invoice_id = %d", $invoice_id));
-        $customer_details = get_customer_details_by_id($invoice_general_data->customer_id);
-        $user_info = get_userdata($invoice_general_data->visitor_id);
-        $user_name = $user_info ? $user_info->user_login : 'Unknown User';
-        $user_link = $user_info ? admin_url('user-edit.php?user_id=' . $invoice_general_data->visitor_id) : '#';
+        $invoice_id             = intval($_GET['invoice_id']);
+        $invoices               = new Xi_Invoices_Invoice();
+        $products               = $invoices->get_product_details($invoice_id, 'sold');
+        $returned_products      = $invoices->get_product_details($invoice_id, 'returned');
+        $invoice_general_data   = $invoices->get_invoice($invoice_id);
+
+        $customer_details       = $customers->get_customer($invoice_general_data->customer_id);
+        $user_info              = get_userdata($invoice_general_data->visitor_id);
+        $user_name              = $user_info ? $user_info->user_login : 'Unknown User';
+        $user_link              = $user_info ? admin_url('user-edit.php?user_id=' . $invoice_general_data->visitor_id) : '#';
     ?>
         <?php
         if ($invoice_general_data) {
@@ -125,37 +92,76 @@ function x_invoice_orders_page()
                                 </div>
                                 <div>
                                     <?php
-                                    echo '<p><b>نام مشتری:</b> ' . esc_html($customer_details['name']) . '</p>';
-                                    echo '<p><b>کد ملی:</b> ' . esc_html($customer_details['national_id']) . '</p>';
-                                    echo '<p><b>نام فروشگاه:</b> ' . esc_html($customer_details['shop_name']) . '</p>';
-                                    echo '<p><b>آدرس مشتری:</b> ' . esc_html($customer_details['address']) . '</p>';
+                                    echo '<p><b>نام مشتری:</b> ' . esc_html($customer_details->customer_name) . '</p>';
+                                    echo '<p><b>کد ملی:</b> ' . esc_html($customer_details->customer_national_id) . '</p>';
+                                    echo '<p><b>نام فروشگاه:</b> ' . esc_html($customer_details->customer_shop_name) . '</p>';
+                                    echo '<p><b>آدرس مشتری:</b> ' . esc_html($customer_details->customer_address) . '</p>';
                                     ?>
                                 </div>
                             </div>
                         </div>
                         <div class="postbox">
-                            <table class="form-table striped table-view-list widefat wp-list-table" id="form-table striped widefat fixed">
-                                <tr>
-                                    <th>محصول</th>
-                                    <th>تعداد</th>
-                                    <th>قیمت واحد</th>
-                                    <th>قیمت کل</th>
-                                </tr>
-                                <?php
-                                foreach ($invoice_details as $detail) {
-                                    $product_name = get_product_name_by_id($detail->product_id);
-                                ?>
+                            <table class="form-table striped table-view-list widefat wp-list-table" id="sold_products">
+                                <thead>
                                     <tr>
-                                        <td><?php echo esc_html($product_name); ?></td>
-                                        <td><?php echo esc_html($detail->product_qty); ?></td>
-                                        <td><?php echo esc_html(number_format($detail->product_net_price)); ?></td>
-                                        <td><?php echo esc_html(number_format($detail->product_total_price)); ?></td>
+                                        <td colspan="4"><b>محصولات فروخته شده</b></td>
                                     </tr>
-                                <?php
-                                }
-                                ?>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th>محصول</th>
+                                        <th>تعداد</th>
+                                        <th>قیمت واحد</th>
+                                        <th>قیمت کل</th>
+                                    </tr>
+                                    <?php
+                                    foreach ($products as $product) {
+                                    ?>
+                                        <tr>
+                                            <td><?php echo esc_html($product->product_name); ?></td>
+                                            <td><?php echo esc_html($product->product_qty); ?></td>
+                                            <td><?php echo esc_html(number_format($product->product_net_price)); ?></td>
+                                            <td><?php echo esc_html(number_format($product->product_total_price)); ?></td>
+                                        </tr>
+                                    <?php
+                                    }
+                                    ?>
+                                </tbody>
                             </table>
                         </div>
+                        <?php
+                        if (!empty($returned_products)) {
+                        ?>
+                            <table class="form-table striped table-view-list widefat wp-list-table" id="returned_products">
+                                <thead>
+                                    <tr>
+                                        <td colspan="4"><b>محصولات مرجوعی</b></td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th>محصول</th>
+                                        <th>تعداد</th>
+                                        <th>قیمت واحد</th>
+                                        <th>قیمت کل</th>
+                                    </tr>
+                                    <?php
+                                    foreach ($returned_products as $product) {
+                                    ?>
+                                        <tr>
+                                            <td><?php echo esc_html($product->product_name); ?></td>
+                                            <td><?php echo esc_html($product->product_qty); ?></td>
+                                            <td><?php echo esc_html(number_format($product->product_net_price)); ?></td>
+                                            <td><?php echo esc_html(number_format($product->product_total_price)); ?></td>
+                                        </tr>
+                                    <?php
+                                    }
+                                    ?>
+                                </tbody>
+                            </table>
+                        <?php
+                        }
+                        ?>
                         <div class="postbox" style="float: left;">
                             <table class="xi-order-totals  table-view-list wp-list-table">
                                 <tbody>

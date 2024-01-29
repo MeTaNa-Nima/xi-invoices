@@ -259,7 +259,6 @@ table.productsList tfoot td, table.returned_productsList tfoot td {
 		flex-direction: column;
 		align-items: normal;
 	}
-	
 }
 .has-error {
     border-color: red;

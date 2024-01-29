@@ -28,6 +28,11 @@ class Xi_Invoices_Products {
         return $this->wpdb->get_row($this->wpdb->prepare("SELECT * FROM $this->table_name WHERE product_name = %s", $product_name));
     }
 
+    // Get Product name by ID
+    public function get_products_name($product_id) {
+        return $this->wpdb->get_row($this->wpdb->prepare("SELECT product_name FROM $this->table_name WHERE product_id = %d", $product_id));
+    }
+
     // Retrieve all products
     public function get_all_products() {
         return $this->wpdb->get_results("SELECT * FROM $this->table_name");

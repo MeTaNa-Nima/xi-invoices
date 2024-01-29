@@ -10,7 +10,6 @@ if (!defined('ABSPATH')) {
 // Front Invoice Shortcode
 function x_invoice_shortcode()
 {
-    // global $wpdb;
 
     $products           = new Xi_Invoices_Products();
     $customers          = new Xi_Invoices_Customers();
@@ -32,19 +31,6 @@ function x_invoice_shortcode()
     }
 
     ob_start();
-    
-    
-
-    // $customers_table_name   = $wpdb->prefix . 'x_invoice_customers';
-    // $products_table_name    = $wpdb->prefix . 'x_invoice_products';
-    // $operations_table_name  = $wpdb->prefix . 'x_invoice_operation_data';
-    // $data_lookup_table_name = $wpdb->prefix . 'x_invoice_data_lookup';
-    // $customers_data         = $wpdb->get_results("SELECT * FROM $customers_table_name", ARRAY_A);
-    // $products_data          = $wpdb->get_results("SELECT * FROM $products_table_name", ARRAY_A);
-    // $operations_data        = $wpdb->get_results("SELECT * FROM $operations_table_name", ARRAY_A);
-    // $data_lookup_data       = $wpdb->get_results("SELECT * FROM $data_lookup_table_name", ARRAY_A);
-
-
 ?>
     <h3 class="xi-current-date">تاریخ امروز: <?php echo $today; ?></h3>
     <form id="x-invoice" class="x-invoice" action="" method="post">
@@ -275,7 +261,6 @@ function x_invoice_shortcode()
 /* Start Data Sending via Ajax */
 function x_invoice_ajax_submit_invoice()
 {
-    // global $wpdb;
     check_ajax_referer('x_invoice_nonce', 'security');
 
     // Extract and sanitize data from $_POST

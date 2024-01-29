@@ -295,8 +295,8 @@ jQuery(document).ready(function ($) {
             'discount_total_amount'     : $('#discount_constant').val(),
             'discount_total_percentage' : $('#discount_percents').val(),
             'payment_method'            : $('.payment_method:checked').val(),
-            'order_total_pure'          : $('.invoice_total_pure').val(),
-            'order_total_final'         : $('.invoice_total_prices').val(),
+            'order_total_pure'          : parseInputValue($('.invoice_total_pure').val()).toString(),
+            'order_total_final'         : parseInputValue($('.invoice_total_prices').val()).toString(),
             'include_returned_products' : $('#include_returned_products').val(),
             'products'                  : []
         };
@@ -332,7 +332,7 @@ jQuery(document).ready(function ($) {
                 console.log(response.data.message);
                 console.log(formData);
                 // Redirect or handle success response
-                // window.location.href = response.data.redirect_url;
+                window.location.href = response.data.redirect_url;
             } else {
                 console.log('Error: ' + response.data.message);
             }

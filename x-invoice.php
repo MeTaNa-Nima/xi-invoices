@@ -2,10 +2,10 @@
 /*
 Plugin Name: X-Invoice
 Description: This is a Invoice WordPress plugin.
-Version: 1.0.1
+Version: 1.0.2
 Author: Nima Amani <metananima@gmail.com>
 */
-define('X_INVOICE_VERSION', '1.0.1');
+define('X_INVOICE_VERSION', '1.0.2');
 define('X_INVOICE_PLUGIN_URL', plugin_dir_url(__FILE__));
 require_once plugin_dir_path(__FILE__) . 'includes/database/db-functions.php';
 
@@ -15,6 +15,7 @@ require_once plugin_dir_path(__FILE__) . 'includes/database/db-functions.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/classes/class-xi-invoices-customers.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/classes/class-xi-invoices-products.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/classes/class-xi-invoices-invoices.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/classes/class-xi-invoices-reports.php';
 
 
 
@@ -113,7 +114,7 @@ add_action('admin_menu', 'x_invoice_plugin_admin_menu');
 
 function x_invoice_enqueue_admin_styles($hook_suffix)
 {
-    wp_enqueue_style('x-invoice-admin-styles', X_INVOICE_PLUGIN_URL . 'assets/css/public.css');
+    wp_enqueue_style('x-invoice-admin-styles', X_INVOICE_PLUGIN_URL . 'assets/css/admin.css');
 }
 add_action('admin_enqueue_scripts', 'x_invoice_enqueue_admin_styles');
 
