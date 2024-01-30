@@ -170,9 +170,9 @@ function x_invoice_shortcode()
             </div>
             <div class="invoice_options">
                 <div class="payment_method_section">
-                    <input type="radio" id="payment_cash" class="payment_method payment_cash" name="payment_method" value="نقدی">
+                    <input type="radio" id="payment_cash" class="payment_method payment_cash" name="payment_method" value="cash">
                     <label for="payment_cash">نقدی</label>
-                    <input type="radio" id="payment_cheq" class="payment_method payment_cheq" name="payment_method" value="چک">
+                    <input type="radio" id="payment_cheq" class="payment_method payment_cheq" name="payment_method" value="cheque">
                     <label for="payment_cheq">چک</label>
                 </div>
                 <div class="payment_discount">
@@ -182,9 +182,9 @@ function x_invoice_shortcode()
                     </div>
                     <div class="payment_discount_method" style="display: none;">
                         <div class="form-controls">
-                            <input type="radio" id="payment_percents" class="payment_discount_methods payment_percents" name="payment_discount_methods" value="درصد">
+                            <input type="radio" id="payment_percents" class="payment_discount_methods payment_percents" name="payment_discount_methods" value="percent">
                             <label for="payment_percents">درصد</label>
-                            <input type="radio" id="payment_constant" class="payment_discount_methods payment_constant" name="payment_discount_methods" value="مبلغ ثابت">
+                            <input type="radio" id="payment_constant" class="payment_discount_methods payment_constant" name="payment_discount_methods" value="constant">
                             <label for="payment_constant">مبلغ ثابت</label>
                         </div>
                         <div class="form-controls">
@@ -298,7 +298,6 @@ function x_invoice_ajax_submit_invoice()
     $invoice = new Xi_Invoices_Invoice();
     $invoice_id = $invoice->add_invoice($operation_data);
 
-    
 
     // Prepare and sanitize product details
     $products_details = array_map(function($product) {
@@ -316,19 +315,6 @@ function x_invoice_ajax_submit_invoice()
 
     // Add product details
     $invoice->add_product_details($invoice_id, $products_details);
-
-
-    /////////////////////////
-    // $new_data = array(
-    //     'product_id'           => '1',
-    //     'product_qty'          => '1000',
-    //     'product_net_price'    => '1000',
-    //     'product_total_price'  => '1000',
-    //     'customer_id'          => '1'
-
-    // );
-    // $invoice->add_product_details_debug($new_data);
-    /////////////////////////
 
 
     // Update the order_id

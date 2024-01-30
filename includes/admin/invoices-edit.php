@@ -40,6 +40,8 @@ function xi_invoice_edit_single()
                                         if ($invoice_general_data->order_include_tax === 'yes') {
                                             echo '<p><b>مقدار مالیات:</b> ' . esc_html(number_format($invoice_general_data->order_total_tax)) . '</p>';
                                         }
+                                        ?>
+                                        <?php
                                         if ($invoice_general_data->order_include_discount === 'yes') {
                                             echo '<p><b>نوع تخفیف:</b> ' . esc_html($invoice_general_data->discount_method) . '</p>';
                                             if ($invoice_general_data->discount_method === 'درصد') {

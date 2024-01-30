@@ -76,8 +76,8 @@ function x_invoice_plugin_admin_menu()
         'فاکتور ها',                // Page title
         'فاکتور ها',                // Menu title
         'manage_options',           // Capability
-        'xi-orders-list',           // Menu slug
-        'invoice_orders_list'       // Function to display the submenu page content
+        'xi-invoices',           // Menu slug
+        'invoice_actions'       // Function to display the submenu page content
     );
     $xi_reports = add_submenu_page(
         'x-invoice',                // Parent slug
@@ -111,14 +111,14 @@ function x_invoice_plugin_admin_menu()
         'xi-edit-customer-data',
         'edit_customer_data_page'
     );
-    $xi_edit_customer_data = add_submenu_page(
-        'x-invoice',
-        'all invoices',
-        'all invoices',
-        'manage_options',
-        'xi-invoices',
-        'invoice_actions'
-    );
+    // $xi_edit_customer_data = add_submenu_page(
+    //     'x-invoice',
+    //     'all invoices',
+    //     'all invoices',
+    //     'manage_options',
+    //     'xi-invoices',
+    //     'invoice_actions'
+    // );
 
 }
 add_action('admin_menu', 'x_invoice_plugin_admin_menu');
