@@ -2,7 +2,7 @@
 /*
 Plugin Name: X-Invoice
 Description: This is a Invoice WordPress plugin.
-Version: 1.1.0
+Version: 1.1.1
 Author: Nima Amani <metananima@gmail.com>
 */
 define('X_INVOICE_VERSION', '1.1.1');
