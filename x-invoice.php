@@ -5,7 +5,7 @@ Description: This is a Invoice WordPress plugin.
 Version: 1.1.0
 Author: Nima Amani <metananima@gmail.com>
 */
-define('X_INVOICE_VERSION', '1.1.0');
+define('X_INVOICE_VERSION', '1.1.1');
 define('X_INVOICE_PLUGIN_URL', plugin_dir_url(__FILE__));
 require_once plugin_dir_path(__FILE__) . 'includes/database/db-functions.php';
 
