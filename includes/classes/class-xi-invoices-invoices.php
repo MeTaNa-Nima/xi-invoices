@@ -97,4 +97,13 @@ class Xi_Invoices_Invoice {
             $invoice_id, $sale_return_flag
         ));
     }
+
+    // Method to get invoices by a specific user ID (visitor_id)
+    public function get_invoices_by_user_id($user_id) {
+        $sql = $this->wpdb->prepare(
+            "SELECT * FROM {$this->operation_data_table} WHERE visitor_id = %d",
+            $user_id
+        );
+        return $this->wpdb->get_results($sql);
+    }
 }

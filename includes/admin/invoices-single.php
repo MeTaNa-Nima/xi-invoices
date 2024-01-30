@@ -150,7 +150,13 @@ function xi_invoice_show_single()
                     </div>
                     <div id="postbox-container-1" class="postbox-container">
                         <div class="postbox">
-                            <a class="button button-secondary" href="admin.php?page=xi-invoices&edit_mode=1&invoice_id=<?php echo $invoice_id; ?>">ویرایش</a>
+                            <?php
+                            if (in_array('administrator', wp_get_current_user()->roles)) {
+                            ?>
+                                <a class="button button-secondary" href="admin.php?page=xi-invoices&edit_mode=1&invoice_id=<?php echo $invoice_id; ?>">ویرایش</a>
+                            <?php
+                            }
+                            ?>
                             <a class="button button-secondary" href="admin.php?page=xi-invoices">بازگشت</a>
                             <a class="button delet-invoice" href="#">حذف فاکتور</a>
                         </div>

@@ -5,9 +5,23 @@ function xi_invoice_show_all()
 {
     $all_invoices   = new Xi_Invoices_Invoice();
     $customers      = new Xi_Invoices_Customers();
-    $invoices       = $all_invoices->get_all_invoices();
+    $current_user   = wp_get_current_user();
+    $subHeader = '';
+
+    // Check if current user is an administrator
+    if (in_array('administrator', $current_user->roles)) {
+        // Admins can see all invoices
+        $invoices = $all_invoices->get_all_invoices();
+        $subHeader = 'همه ویزیتور ها';
+    } else {
+        // Other users see only their invoices
+        $invoices = $all_invoices->get_invoices_by_user_id($current_user->ID);
+        $subHeader = 'شما';
+    }
+
+
 ?>
-        <h2>فاکتور های ثبت شده:</h2>
+        <h2>فاکتور های ثبت شده توسط <?php echo esc_html($subHeader);?>:</h2>
         <table class="form-table striped table-view-list widefat wp-list-table" id="form-table striped widefat fixed">
             <tr>
                 <th>شناسه</th>
