@@ -22,6 +22,9 @@ body, input, select, h1, h2, h3, h4, h5, h6, p {
 	width: calc(100% - 2em);
 }
 
+.table.clientDataTable td.x_invoice_top_td {
+	max-width: 33.3%;
+}
 /* View Invoice Page Start */
 .xi-current-date {
 	text-align: center;

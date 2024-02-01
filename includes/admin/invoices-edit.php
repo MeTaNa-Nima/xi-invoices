@@ -5,6 +5,8 @@ function xi_invoice_edit_single()
 {
     $all_invoices   = new Xi_Invoices_Invoice();
     $customers      = new Xi_Invoices_Customers();
+
+    $allCustomers = $customers->get_all_customers();
     $invoices       = $all_invoices->get_all_invoices();
 
     if (isset($_GET['invoice_id']) && is_numeric($_GET['invoice_id'])) {
@@ -13,11 +15,17 @@ function xi_invoice_edit_single()
         $products               = $invoices->get_product_details($invoice_id, 'sold');
         $returned_products      = $invoices->get_product_details($invoice_id, 'returned');
         $invoice_general_data   = $invoices->get_invoice($invoice_id);
+        // $includesReturneds      = ;
+
 
         $customer_details       = $customers->get_customer($invoice_general_data->customer_id);
         $user_info              = get_userdata($invoice_general_data->visitor_id);
-        $user_name              = $user_info ? $user_info->user_login : 'Unknown User';
-        $user_link              = $user_info ? admin_url('user-edit.php?user_id=' . $invoice_general_data->visitor_id) : '#';
+        // $user_name              = $user_info ? $user_info->user_login : 'Unknown User';
+        // $user_link              = $user_info ? admin_url('user-edit.php?user_id=' . $invoice_general_data->visitor_id) : '#';
+
+        $marketers = new WP_User_Query(array('role' => 'marketer'));
+        $marketer_users = $marketers->get_results();
+
 ?>
         <?php
         if ($invoice_general_data) {
@@ -28,38 +36,84 @@ function xi_invoice_edit_single()
                         <div id="postbox-container-2" class="postbox-container">
                             <div class="postbox">
                                 <div class="xi-invoice-info invoice-info_general">
-                                    <h2>فاکتور شماره <?php echo $invoice_id; ?></h2>
-                                    <p>تاریخ: <?php echo esc_html($invoice_general_data->date_submit_gmt); ?></p>
-                                    <a href="<?php echo esc_url($user_link); ?>">ویزیتور: <?php echo esc_html($user_name); ?></a>
+                                    <table class="form-table">
+                                        <tr>
+                                            <th>شماره فاکتور</th>
+                                            <th>تاریخ</th>
+                                            <th><label for="visitor">ویزیتور ثبت کننده</label></th>
+                                        </tr>
+                                        <tr>
+                                            <td><?php echo $invoice_id; ?></td>
+                                            <td><?php echo esc_html($invoice_general_data->date_submit_gmt); ?></td>
+                                            <td>
+                                                <select name="visitor" id="visitor" class="visitor">
+                                                    <option value="">— انتخاب ویزیتور —</option>
+                                                    <?php foreach ($marketer_users as $user) : ?>
+                                                        <option value="<?php echo esc_attr($user->ID); ?>" <?php selected($invoice_general_data->visitor_id, $user->ID); ?>>
+                                                            <?php echo esc_html($user->display_name); ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                    </table>
                                 </div>
                             </div>
                             <div class="postbox">
                                 <div class="xi-invoice-info invoice-info_customer">
-                                    <div>
-                                        <?php
-                                        if ($invoice_general_data->order_include_tax === 'yes') {
-                                            echo '<p><b>مقدار مالیات:</b> ' . esc_html(number_format($invoice_general_data->order_total_tax)) . '</p>';
-                                        }
-                                        ?>
-                                        <?php
-                                        if ($invoice_general_data->order_include_discount === 'yes') {
-                                            echo '<p><b>نوع تخفیف:</b> ' . esc_html($invoice_general_data->discount_method) . '</p>';
-                                            if ($invoice_general_data->discount_method === 'درصد') {
-                                                echo '<p><b>مقدار تخفیف:</b> ' . esc_html(number_format($invoice_general_data->discount_total_percentage)) . '%</p>';
-                                            } elseif ($invoice_general_data->discount_method === 'مبلغ ثابت') {
-                                                echo '<p><b>مقدار تخفیف:</b> ' . esc_html(number_format($invoice_general_data->discount_total_amount)) . ' تومان </p>';
-                                            }
-                                        }
-                                        ?>
-                                    </div>
-                                    <div>
-                                        <?php
-                                        echo '<p><b>نام مشتری:</b> ' . esc_html($customer_details->customer_name) . '</p>';
-                                        echo '<p><b>کد ملی:</b> ' . esc_html($customer_details->customer_national_id) . '</p>';
-                                        echo '<p><b>نام فروشگاه:</b> ' . esc_html($customer_details->customer_shop_name) . '</p>';
-                                        echo '<p><b>آدرس مشتری:</b> ' . esc_html($customer_details->customer_address) . '</p>';
-                                        ?>
-                                    </div>
+                                    <table class="form-table">
+                                        <tr>
+                                            <th><label for="tax_amount_value">درصد مالیات معادل</label></th>
+                                            <td>
+                                                <input type="text" name="tax_amount_value" id="tax_amount_value" class="tax tax_amount_value" value="<?php echo esc_html(number_format($invoice_general_data->order_total_tax)); ?>" pattern="^([0-9]|[1-9][0-9]|100)$" title="Please enter a number between 0 and 100">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th><label for="tax_amount_value">مقدار تخفیف (ریال)</label></th>
+                                            <td>
+                                                <input type="text" id="payment_constant" class="payment_discount_methods payment_constant" name="payment_discount_methods" value="<?php echo esc_html(number_format($invoice_general_data->discount_total_amount)); ?>" inputmode="numeric">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th><label for="include_returned_products">کالای مرجویع</label></th>
+                                            <td>
+                                                <input type="checkbox" name="include_returned_products" id="include_returned_products" class="include_returned_products" <?php checked(!empty($returned_products)); ?>>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th></th>
+                                            <td></td>
+                                        </tr>
+                                    </table>
+
+                                    <table class="form-table">
+                                        <tr>
+                                            <th><label for="customer_name">مشتری</label></th>
+                                            <td>
+                                                <select name="customer_name" class="customer_name" id="customer_name" onChange="fetchCustomerDetails(this.value)">
+                                                    <option value="">— انتخاب مشتری —</option>
+                                                    <?php foreach ($allCustomers as $customer) : ?>
+                                                        <option value="<?php echo esc_attr($customer->customer_id); ?>" <?php selected($customer_details->customer_id, $customer->customer_id); ?>>
+                                                            <?php echo esc_html($customer->customer_name); ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                                <input type="hidden" class="this_customer_id" name="this_customer_id" value="">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>کد ملی</th>
+                                            <td class="customer_national_id"><?php echo esc_html($customer_details->customer_national_id); ?></td>
+                                        </tr>
+                                        <tr>
+                                            <th>نام فروشگاه</th>
+                                            <td class="customer_shop_name"><?php echo esc_html($customer_details->customer_shop_name); ?></td>
+                                        </tr>
+                                        <tr>
+                                            <th>آدرس مشتری</th>
+                                            <td class="customer_address"><?php echo esc_html($customer_details->customer_address); ?></td>
+                                        </tr>
+                                    </table>
                                 </div>
                             </div>
                             <div class="postbox">

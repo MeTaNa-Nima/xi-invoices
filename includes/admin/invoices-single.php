@@ -37,14 +37,13 @@ function xi_invoice_show_single()
                                 <div>
                                     <?php
                                     if ($invoice_general_data->order_include_tax === 'yes') {
-                                        echo '<p><b>مقدار مالیات:</b> ' . esc_html(number_format($invoice_general_data->order_total_tax)) . '</p>';
+                                        echo '<p><b>درصد مالیات:</b> ' . esc_html(number_format($invoice_general_data->order_total_tax)) . '</p>';
                                     }
                                     if ($invoice_general_data->order_include_discount === 'yes') {
-                                        echo '<p><b>نوع تخفیف:</b> ' . esc_html($invoice_general_data->discount_method) . '</p>';
-                                        if ($invoice_general_data->discount_method === 'درصد') {
-                                            echo '<p><b>مقدار تخفیف:</b> ' . esc_html(number_format($invoice_general_data->discount_total_percentage)) . '%</p>';
-                                        } elseif ($invoice_general_data->discount_method === 'مبلغ ثابت') {
-                                            echo '<p><b>مقدار تخفیف:</b> ' . esc_html(number_format($invoice_general_data->discount_total_amount)) . ' تومان </p>';
+                                        if ($invoice_general_data->discount_method === 'percent') {
+                                            echo '<p><b>مقدار تخفیف:</b> ' . esc_html(number_format($invoice_general_data->discount_total_percentage)) . ' % معادل ' . esc_html(number_format($invoice_general_data->discount_total_amount)) . ' ریال </p>';
+                                        } elseif ($invoice_general_data->discount_method === 'constant') {
+                                            echo '<p><b>مقدار تخفیف:</b> ' . esc_html(number_format($invoice_general_data->discount_total_amount)) . ' ریال </p>';
                                         }
                                     }
                                     ?>
@@ -137,7 +136,7 @@ function xi_invoice_show_single()
                                     <tr>
                                         <td class="label">تخفیف:</td>
                                         <td width="1%"></td>
-                                        <td class="total"><?php echo esc_html(number_format($invoice_general_data->discount_total_amount)); ?> / <?php echo esc_html($invoice_general_data->discount_total_percentage); ?></td>
+                                        <td class="total"><?php echo esc_html(number_format($invoice_general_data->discount_total_amount)); ?></td>
                                     </tr>
                                     <tr>
                                         <td class="label">جمع کل نهایی:</td>

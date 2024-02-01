@@ -201,6 +201,29 @@ function edit_customer_data_page()
 
 
 
+function x_invoice_enqueue_scripts() {
+    // Enqueue the common.js script
+    wp_enqueue_script(
+        'x-invoice-common',
+        X_INVOICE_PLUGIN_URL . 'assets/js/common.js',
+        array('jquery'), // Dependency on jQuery
+        '',             // Version number (optional)
+        true            // Load in footer (optional but recommended)
+    );
+
+    
+    // Localize the script with new data
+    $translation_array = array(
+        'ajaxurl' => admin_url('admin-ajax.php'),
+        'nonce'     => wp_create_nonce('x_invoice_nonce')
+    );
+    wp_localize_script('x-invoice-common', 'myAjax', $translation_array);
+
+}
+
+add_action('wp_enqueue_scripts', 'x_invoice_enqueue_scripts');
+add_action('admin_enqueue_scripts', 'x_invoice_enqueue_scripts');
+
 
 
 

@@ -48,8 +48,9 @@ function x_invoice_shortcode()
                     <tr>
                         <td class="x_invoice_top_td">
                             <input class="current_user" readonly type="" value="<?php echo $user_display_name; ?>">
-                            <input type="hidden" name="" value="<?php echo $user_id; ?>">
+                            <input type="hidden" readonly name="" value="<?php echo $user_id; ?>">
                             <input type="hidden" readonly id="current-date-time" class="current-date-time" name="current-date-time" value="<?php echo $current_date_time; ?>">
+                            <input type="hidden" readonly name="discount_calculated" id="discount_calculated" class="discounts discount_calculated" value="">
                         </td>
                         <td class="x_invoice_top_td">
                             <select name="customer_name" class="customer_name" id="customer_name" onChange="fetchCustomerDetails(this.value)">
@@ -64,11 +65,11 @@ function x_invoice_shortcode()
                             </select>
                             <input type="hidden" class="this_customer_id" name="this_customer_id" value="">
                         </td>
-                        <td class="x_invoice_top_td"><input class="customer_shop_name" readonly type="" value=""></td>
+                        <td class="x_invoice_top_td customer_shop_name">— انتخاب کنید —</td>
                     </tr>
                     <tr>
                         <td colspan="1">آدرس مشتری:</td>
-                        <td colspan="2" class="x_invoice_top_td"><input class="customer_address" readonly type="" value=""></td>
+                        <td colspan="2" class="customer_address">— انتخاب کنید —</td>
                     </tr>
                 </tbody>
             </table>
@@ -228,31 +229,7 @@ function x_invoice_shortcode()
     </form>
     <div id="results_container"></div>
     <script>
-        function fetchCustomerDetails(customerId) {
-            if (customerId == -1) {
-                // Reset the fields if no customer is selected
-                jQuery('.customer_shop_name').val('');
-                jQuery('.customer_address').val('');
-                jQuery('.customer_national_id').val('');
-                return;
-            }
-            jQuery.ajax({
-                url: '<?php echo admin_url('admin-ajax.php'); ?>',
-                type: 'POST',
-                data: {
-                    action: 'get_customer_details',
-                    customer_id: customerId
-                },
-                success: function(response) {
-                    if (response) {
-                        var data = JSON.parse(response);
-                        jQuery('.customer_shop_name').val(data.shop_name);
-                        jQuery('.customer_address').val(data.address);
-                        jQuery('.customer_national_id').val(data.national_id);
-                    }
-                }
-            });
-        };
+
     </script>
 <?php
     return ob_get_clean();
@@ -272,6 +249,7 @@ function x_invoice_ajax_submit_invoice()
     $discount_method            = sanitize_text_field($_POST['discount_method']);
     $discount_total_amount      = sanitize_text_field($_POST['discount_total_amount']);
     $discount_total_percentage  = sanitize_text_field($_POST['discount_total_percentage']);
+    $discount_calculated        = sanitize_text_field($_POST['discount_calculated']);
     $payment_method             = sanitize_text_field($_POST['payment_method']);
     $order_total_pure           = sanitize_text_field($_POST['order_total_pure']);
     $order_total_final          = sanitize_text_field($_POST['order_total_final']);
@@ -285,7 +263,7 @@ function x_invoice_ajax_submit_invoice()
         'order_include_discount'    => $order_include_discount,
         'discount_method'           => $discount_method,
         'date_submit_gmt'           => $date_time,
-        'discount_total_amount'     => $discount_total_amount,
+        'discount_total_amount'     => $discount_calculated,
         'discount_total_percentage' => $discount_total_percentage,
         'payment_method'            => $payment_method,
         'customer_id'               => $customer_id,
@@ -349,7 +327,7 @@ add_action('wp_ajax_nopriv_get_customer_details', 'get_customer_details');
 function x_invoice_files()
 {
     wp_enqueue_style('x-invoice', X_INVOICE_PLUGIN_URL . 'assets/css/public.css');
-    wp_enqueue_script('x-invoice', X_INVOICE_PLUGIN_URL . 'assets/js/public.js', array('jquery'), null, true);
+    // wp_enqueue_script('x-invoice', X_INVOICE_PLUGIN_URL . 'assets/js/public.js', array('jquery'), null, true);
     wp_localize_script('x-invoice', 'myAjax', array(
         'ajaxurl'   => admin_url('admin-ajax.php'),
         'nonce'     => wp_create_nonce('x_invoice_nonce')
