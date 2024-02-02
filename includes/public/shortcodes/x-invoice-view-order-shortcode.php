@@ -64,7 +64,7 @@ function x_invoice_view_order_shortcode()
         $invoice = $invoices->get_invoice_details($invoice_number);
         $products = $invoices->get_product_details($invoice_number, 'sold');
         $returned_products = $invoices->get_product_details($invoice_number, 'returned');
-
+        $datetime = new DateTime($invoice->date_submit_gmt);
         if ($invoice) {
             
             if ($invoice->payment_method === 'cash') {
@@ -82,7 +82,7 @@ function x_invoice_view_order_shortcode()
             $xi_invoice_view_output .= '<hr>';
             // Header End
             $xi_invoice_view_output .= '<p class="xi-invoice-number"><b>' . esc_html($invoice->invoice_id) . '</b></p>';
-            $xi_invoice_view_output .= '<p><b>تاریخ ثبت:</b> ' . esc_html($invoice->date_submit_gmt) . '</p>';
+            $xi_invoice_view_output .= '<p><b>تاریخ ثبت:</b> ' . esc_html($datetime->format('Y/n/j')) . '</p>';
             $xi_invoice_view_output .= '<p><b>نام ویزیتور:</b> ' . esc_html($invoice->visitor_name) . '</p>';
             $xi_invoice_view_output .= '<p><b>نام مشتری:</b> ' . esc_html($invoice->customer_name) . '</p>';
             $xi_invoice_view_output .= '<p><b>نام فروشگاه:</b> ' . esc_html($invoice->customer_shop_name) . '</p>';

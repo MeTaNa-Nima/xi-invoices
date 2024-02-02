@@ -62,7 +62,7 @@ function xi_invoice_show_single()
                                 </div>
                             </div>
                             <div class="postbox">
-                                <table class="form-table striped table-view-list widefat wp-list-table" id="sold_products">
+                                <table class="form-table striped table-view-list widefat wp-list-table productsList" id="productsList">
                                     <thead>
                                         <tr>
                                             <td colspan="4"><b>محصولات فروخته شده</b></td>
@@ -93,7 +93,7 @@ function xi_invoice_show_single()
                             <?php
                             if (!empty($returned_products)) {
                             ?>
-                                <table class="form-table striped table-view-list widefat wp-list-table" id="returned_products">
+                                <table class="form-table striped table-view-list widefat wp-list-table returned_productsList" id="returned_productsList">
                                     <thead>
                                         <tr>
                                             <td colspan="4"><b>محصولات مرجوعی</b></td>

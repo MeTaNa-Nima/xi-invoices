@@ -5,8 +5,10 @@ function xi_invoice_edit_single()
 {
     $all_invoices   = new Xi_Invoices_Invoice();
     $customers      = new Xi_Invoices_Customers();
+    $all_products   = (new Xi_Invoices_Products())->get_all_products();
 
-    $allCustomers = $customers->get_all_customers();
+
+    $allCustomers   = $customers->get_all_customers();
     $invoices       = $all_invoices->get_all_invoices();
 
     if (isset($_GET['invoice_id']) && is_numeric($_GET['invoice_id'])) {
@@ -47,7 +49,7 @@ function xi_invoice_edit_single()
                                             <td><?php echo esc_html($invoice_general_data->date_submit_gmt); ?></td>
                                             <td>
                                                 <select name="visitor" id="visitor" class="visitor">
-                                                    <option value="">— انتخاب ویزیتور —</option>
+                                                    <option value="-1">— انتخاب ویزیتور —</option>
                                                     <?php foreach ($marketer_users as $user) : ?>
                                                         <option value="<?php echo esc_attr($user->ID); ?>" <?php selected($invoice_general_data->visitor_id, $user->ID); ?>>
                                                             <?php echo esc_html($user->display_name); ?>
@@ -65,13 +67,13 @@ function xi_invoice_edit_single()
                                         <tr>
                                             <th><label for="tax_amount_value">درصد مالیات معادل</label></th>
                                             <td>
-                                                <input type="text" name="tax_amount_value" id="tax_amount_value" class="tax tax_amount_value" value="<?php echo esc_html(number_format($invoice_general_data->order_total_tax)); ?>" pattern="^([0-9]|[1-9][0-9]|100)$" title="Please enter a number between 0 and 100">
+                                                <input readonly type="text" name="tax_amount_value" id="tax_amount_value" class="tax tax_amount_value" value="<?php echo esc_html(number_format($invoice_general_data->order_total_tax)); ?>" pattern="^([0-9]|[1-9][0-9]|100)$" title="Please enter a number between 0 and 100">
                                             </td>
                                         </tr>
                                         <tr>
                                             <th><label for="tax_amount_value">مقدار تخفیف (ریال)</label></th>
                                             <td>
-                                                <input type="text" id="payment_constant" class="payment_discount_methods payment_constant" name="payment_discount_methods" value="<?php echo esc_html(number_format($invoice_general_data->discount_total_amount)); ?>" inputmode="numeric">
+                                                <input readonly type="text" id="payment_constant" class="payment_discount_methods payment_constant" name="payment_discount_methods" value="<?php echo esc_html(number_format($invoice_general_data->discount_total_amount)); ?>" inputmode="numeric">
                                             </td>
                                         </tr>
                                         <tr>
@@ -91,7 +93,7 @@ function xi_invoice_edit_single()
                                             <th><label for="customer_name">مشتری</label></th>
                                             <td>
                                                 <select name="customer_name" class="customer_name" id="customer_name" onChange="fetchCustomerDetails(this.value)">
-                                                    <option value="">— انتخاب مشتری —</option>
+                                                    <option value="-1">— انتخاب مشتری —</option>
                                                     <?php foreach ($allCustomers as $customer) : ?>
                                                         <option value="<?php echo esc_attr($customer->customer_id); ?>" <?php selected($customer_details->customer_id, $customer->customer_id); ?>>
                                                             <?php echo esc_html($customer->customer_name); ?>
@@ -117,10 +119,10 @@ function xi_invoice_edit_single()
                                 </div>
                             </div>
                             <div class="postbox">
-                                <table class="form-table striped table-view-list widefat wp-list-table" id="sold_products">
+                                <table class="form-table striped table-view-list widefat wp-list-table productsList" id="productsList">
                                     <thead>
                                         <tr>
-                                            <td colspan="4"><b>محصولات فروخته شده</b></td>
+                                            <td colspan="5"><b>محصولات فروخته شده</b></td>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -129,52 +131,124 @@ function xi_invoice_edit_single()
                                             <th>تعداد</th>
                                             <th>قیمت واحد</th>
                                             <th>قیمت کل</th>
+                                            <th>افزودن/حذف
+                                                <br>ردیف
+                                            </th>
                                         </tr>
                                         <?php
                                         foreach ($products as $product) {
                                         ?>
                                             <tr>
-                                                <td><?php echo esc_html($product->product_name); ?></td>
-                                                <td><?php echo esc_html($product->product_qty); ?></td>
-                                                <td><?php echo esc_html(number_format($product->product_net_price)); ?></td>
-                                                <td><?php echo esc_html(number_format($product->product_total_price)); ?></td>
+                                                <td class="x_invoice_table_td products_col">
+                                                    <select name="custom_product_name[]" class="custom_product_name">
+                                                        <option value="-1">— انتخاب محصول —</option>
+                                                        <?php foreach ($all_products as $data) : ?>
+                                                            <option value="<?php echo esc_attr($data->product_id); ?>" <?php selected($data->product_id, $product->product_id); ?>>
+                                                                <?php echo esc_html($data->product_name); ?>
+                                                            </option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                </td>
+                                                <td class="x_invoice_table_td qty_col"><input class="custom_product_amount" type="text" inputmode="numeric" value="<?php echo esc_html($product->product_qty); ?>"></td>
+                                                <td class="x_invoice_table_td price_col"><input class="custom_product_price" type="text" inputmode="numeric" value="<?php echo esc_html(number_format($product->product_net_price)); ?>"></td>
+                                                <td class="x_invoice_table_td total_price_col">
+                                                    <span class="custom_product_show_only"><?php echo esc_html(number_format($product->product_total_price)); ?></span>
+                                                    <input readonly type="hidden" class="custom_product_total" value="<?php echo esc_html(number_format($product->product_total_price)); ?>">
+                                                </td>
+                                                <td class="x_invoice_table_td x_invoice_table_td_btn">
+                                                    <button class="add_new_row add_new_product_row">+</button>
+                                                    <button class="remove_this_row remove_product_row" style="display: none;">—</button>
+                                                </td>
                                             </tr>
                                         <?php
                                         }
                                         ?>
                                     </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="2"></td>
+                                            <td>
+                                                <div class="invoice_total_title">
+                                                    جمع کل قبل از تخفیف:
+                                                </div>
+                                            </td>
+                                            <td colspan="2">
+                                                <div class="invoice_total_output">
+                                                    <span class="invoice_total_pure_show_only"></span>
+                                                    <input readonly type="hidden" name="invoice_total_pure" class="invoice_total_pure" value=""> ریال
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
                                 </table>
                             </div>
                             <?php
                             if (!empty($returned_products)) {
                             ?>
-                                <table class="form-table striped table-view-list widefat wp-list-table" id="returned_products">
-                                    <thead>
-                                        <tr>
-                                            <td colspan="4"><b>محصولات مرجوعی</b></td>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <th>محصول</th>
-                                            <th>تعداد</th>
-                                            <th>قیمت واحد</th>
-                                            <th>قیمت کل</th>
-                                        </tr>
-                                        <?php
-                                        foreach ($returned_products as $product) {
-                                        ?>
+                                <div class="postbox">
+                                    <table class="form-table striped table-view-list widefat wp-list-table returned_productsList" id="returned_productsList">
+                                        <thead>
                                             <tr>
-                                                <td><?php echo esc_html($product->product_name); ?></td>
-                                                <td><?php echo esc_html($product->product_qty); ?></td>
-                                                <td><?php echo esc_html(number_format($product->product_net_price)); ?></td>
-                                                <td><?php echo esc_html(number_format($product->product_total_price)); ?></td>
+                                                <td colspan="5"><b>محصولات مرجوعی</b></td>
                                             </tr>
-                                        <?php
-                                        }
-                                        ?>
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <th>محصول</th>
+                                                <th>تعداد</th>
+                                                <th>قیمت واحد</th>
+                                                <th>قیمت کل</th>
+                                                <th>افزودن/حذف
+                                                    <br>ردیف
+                                                </th>
+                                            </tr>
+                                            <?php
+                                            foreach ($returned_products as $product) {
+                                            ?>
+                                                <tr>
+                                                    <td class="x_invoice_table_td products_col">
+                                                        <select name="custom_product_name[]" class="custom_product_name">
+                                                            <option value="-1">— انتخاب محصول —</option>
+                                                            <?php foreach ($all_products as $data) : ?>
+                                                                <option value="<?php echo esc_attr($data->product_id); ?>" <?php selected($data->product_id, $product->product_id); ?>>
+                                                                    <?php echo esc_html($data->product_name); ?>
+                                                                </option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </td>
+                                                    <td class="x_invoice_table_td qty_col"><input class="custom_product_amount" type="text" inputmode="numeric" value="<?php echo esc_html($product->product_qty); ?>"></td>
+                                                    <td class="x_invoice_table_td price_col"><input class="custom_product_price" type="text" inputmode="numeric" value="<?php echo esc_html(number_format($product->product_net_price)); ?>"></td>
+                                                    <td class="x_invoice_table_td total_price_col">
+                                                        <span class="custom_product_show_only"><?php echo esc_html(number_format($product->product_total_price)); ?></span>
+                                                        <input readonly type="hidden" class="custom_product_total" value="<?php echo esc_html(number_format($product->product_total_price)); ?>">
+                                                    </td>
+                                                    <td class="x_invoice_table_td x_invoice_table_td_btn">
+                                                        <button class="add_new_row add_new_returned_row">+</button>
+                                                        <button class="remove_this_row remove_returned_row" style="display: none;">—</button>
+                                                    </td>
+                                                </tr>
+                                            <?php
+                                            }
+                                            ?>
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <td colspan="2"></td>
+                                                <td>
+                                                    <div class="invoice_total_title">
+                                                        جمع کل مرجوعی ها:
+                                                    </div>
+                                                </td>
+                                                <td colspan="2">
+                                                    <div class="invoice_total_returned_output">
+                                                        <span class="invoice_total_returned_pure_show_only"></span>
+                                                        <input readonly type="hidden" name="invoice_total_returned_pure" class="invoice_total_returned_pure" value=""> ریال
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
                             <?php
                             }
                             ?>
@@ -182,19 +256,32 @@ function xi_invoice_edit_single()
                                 <table class="xi-order-totals  table-view-list wp-list-table">
                                     <tbody>
                                         <tr>
-                                            <td class="label">جمع موارد:</td>
+                                            <td class="label">
+                                                <div class="invoice_total_title">
+                                                    جمع موارد:
+                                                </div>
+                                            </td>
                                             <td width="1%"></td>
-                                            <td class="total"><?php echo esc_html(number_format($invoice_general_data->order_total_pure)); ?></td>
+                                            <td class="total">
+                                                <div class="invoice_total_output">
+                                                    <span class="invoice_total_prices_show_only"></span>
+                                                    <input readonly type="hidden" name="invoice_total_prices" class="invoice_total_prices" value="<?php echo esc_html(number_format($invoice_general_data->order_total_pure)); ?>"> ریال
+                                                </div>
+                                            </td>
                                         </tr>
                                         <tr>
-                                            <td class="label">مالیات:</td>
+                                            <td class="label"><label for="tax_amount">درصد مالیات معادل:</label></td>
                                             <td width="1%"></td>
-                                            <td class="total"><?php echo esc_html(number_format($invoice_general_data->order_total_tax)); ?></td>
+                                            <td class="total">
+                                                <input type="number" name="tax_amount_value" id="tax_amount_value" class="tax tax_amount_value" value="<?php echo esc_html(number_format($invoice_general_data->order_total_tax)); ?>">
+                                            </td>
                                         </tr>
                                         <tr>
                                             <td class="label">تخفیف:</td>
                                             <td width="1%"></td>
-                                            <td class="total"><?php echo esc_html(number_format($invoice_general_data->discount_total_amount)); ?> / <?php echo esc_html($invoice_general_data->discount_total_percentage); ?></td>
+                                            <td class="total">
+                                                <input type="number" name="discount_constant" id="discount_constant" class="discounts discount_constant" value="<?php echo esc_html(number_format($invoice_general_data->discount_total_amount)); ?>" placeholder="مبلغ تخفیف را وارد نمایید.">
+                                            </td>
                                         </tr>
                                         <tr>
                                             <td class="label">جمع کل نهایی:</td>

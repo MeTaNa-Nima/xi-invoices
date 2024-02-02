@@ -99,11 +99,46 @@ class Xi_Invoices_Invoice {
     }
 
     // Method to get invoices by a specific user ID (visitor_id)
-    public function get_invoices_by_user_id($user_id) {
+    public function get_invoices_by_user_id($user_id, $page = 1, $per_page = 20) {
+        $offset = ($page - 1) * $per_page;
+        $sql = $this->wpdb->prepare(
+            "SELECT * FROM {$this->operation_data_table} WHERE visitor_id = %d LIMIT %d, %d",
+            $user_id, $offset, $per_page
+        );
+        return $this->wpdb->get_results($sql);
+    }
+
+    // Method to get the total count of invoices for a specific user
+    public function get_total_invoices_count_by_user($user_id) {
+        $sql = $this->wpdb->prepare(
+            "SELECT COUNT(*) FROM {$this->operation_data_table} WHERE visitor_id = %d",
+            $user_id
+        );
+        return (int) $this->wpdb->get_var($sql);
+    }
+
+    // Method to get paginated invoices
+    public function get_paginated_invoices($page_number = 1, $per_page = 20) {
+        $offset = ($page_number - 1) * $per_page;
+        $query = $this->wpdb->prepare(
+            "SELECT * FROM {$this->operation_data_table} ORDER BY invoice_id DESC LIMIT %d, %d",
+            $offset, $per_page
+        );
+        return $this->wpdb->get_results($query);
+    }
+
+    // Method to get total number of invoices
+    public function get_total_invoices_count() {
+        return $this->wpdb->get_var("SELECT COUNT(*) FROM {$this->operation_data_table}");
+    }
+
+    // Method to get invoices by a specific user ID (visitor_id)
+    public function get_paginated_invoices_by_user_id($user_id, $page_number = 1, $per_page = 20) {
         $sql = $this->wpdb->prepare(
             "SELECT * FROM {$this->operation_data_table} WHERE visitor_id = %d",
             $user_id
         );
         return $this->wpdb->get_results($sql);
     }
+
 }

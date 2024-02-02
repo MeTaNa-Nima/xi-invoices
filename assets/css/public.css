@@ -198,6 +198,7 @@ form#x-invoice {
 	flex-direction: row;
 	align-items: center;
 	gap: 0.5em;
+	flex: auto;
 }
 input#tax_amount_value {
     width: 15%;
@@ -276,9 +277,16 @@ table.productsList tfoot td, table.returned_productsList tfoot td {
 	body {
 		font-size: 0.8em;
 	}
-	.invoice_options, .payment_tax, .payment_discount, .payment_discount_method {
+	.invoice_options, .payment_discount_method {
 		flex-direction: column;
-		align-items: normal;
+		align-items
+		: normal;
+	}
+	.payment_discount_method .form-controls {
+		display: flex;
+	}
+	.payment_discount_method .form-controls #payment_constant, .payment_discount_method .form-controls #payment_percents {
+		margin-right: 1em;
 	}
 }
 .has-error {

@@ -218,7 +218,6 @@ function x_invoice_shortcode()
                     <span class="invoice_total_prices_show_only"></span>
                     <input readonly type="hidden" name="invoice_total_prices" class="invoice_total_prices" value=""> ریال
                 </div>
-
             </div>
             <hr>
             <div class="submit-section">
@@ -228,9 +227,6 @@ function x_invoice_shortcode()
         </div>
     </form>
     <div id="results_container"></div>
-    <script>
-
-    </script>
 <?php
     return ob_get_clean();
 }

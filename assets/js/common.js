@@ -205,7 +205,7 @@ jQuery(document).ready(function ($) {
 		updateInvoiceSummary();
 	});
 
-	$("#invoice_discount").change(function () {
+	$(".payment_discount #invoice_discount").change(function () {
 		if ($(this).is(":checked")) {
 			$(".payment_discount_method").prop("disabled", false);
 			$(".payment_discount_method").fadeIn();
@@ -215,21 +215,21 @@ jQuery(document).ready(function ($) {
 		}
 	});
 	function toggleDiscountFields() {
-		var isPercent = $("#payment_percents").is(":checked");
-		var isConstant = $("#payment_constant").is(":checked");
+		var isPercent = $(".payment_discount #payment_percents").is(":checked");
+		var isConstant = $(".payment_discount #payment_constant").is(":checked");
 		if (isPercent) {
-			$("#discount_percents").prop("disabled", false);
-			$("#discount_percents").show();
+			$(".payment_discount #discount_percents").prop("disabled", false);
+			$(".payment_discount #discount_percents").show();
 		} else {
-			$("#discount_percents").prop("disabled", true);
-			$("#discount_percents").hide();
+			$(".payment_discount #discount_percents").prop("disabled", true);
+			$(".payment_discount #discount_percents").hide();
 		}
 		if (isConstant) {
-			$("#discount_constant").prop("disabled", false);
-			$("#discount_constant").show();
+			$(".payment_discount #discount_constant").prop("disabled", false);
+			$(".payment_discount #discount_constant").show();
 		} else {
-			$("#discount_constant").prop("disabled", true);
-			$("#discount_constant").hide();
+			$(".payment_discount #discount_constant").prop("disabled", true);
+			$(".payment_discount #discount_constant").hide();
 		}
 	}
 	toggleDiscountFields();

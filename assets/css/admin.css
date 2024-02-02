@@ -24,8 +24,8 @@ p {
 	font-family: "IRANSansFaNum", sans-serif !important;
 }
 
-table#sold_products thead td,
-table#returned_products thead td {
+table#productsList thead td,
+table#returned_productsList thead td {
 	text-align: center;
 }
 #x-invoice-customers-table input {
@@ -57,4 +57,11 @@ table#returned_products thead td {
 .xi-order-totals {
 	line-height: 2em;
 	padding: 0.5em 1em;
+}
+
+.tablenav-pages.xi_invoices_all > * {
+    padding: 5px 15px;
+    border: 1px solid;
+    border-radius: 5px;
+    background-color: white;
 }
