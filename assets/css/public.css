@@ -19,8 +19,25 @@ body, input, select, h1, h2, h3, h4, h5, h6, p {
 .x-invoice-form-inputs .x_invoice_table_td input,
 .x-invoice-form-inputs .x_invoice_top_td select,
 .x-invoice-form-inputs .x_invoice_table_td select {
-	width: calc(100% - 2em);
+	width: calc(100% - 0em);
 }
+#productsList .products_col, #returned_productsList .products_col {
+	width: 30%;
+}
+#productsList .qty_col, #returned_productsList .qty_col {
+	width: 20%;
+}
+#productsList .price_col, #returned_productsList .price_col {
+	width: 20%;
+}
+#productsList .total_price_col, #returned_productsList .total_price_col {
+	width: 15%;
+}
+#productsList .x_invoice_table_td_btn, #returned_productsList .x_invoice_table_td_btn {
+	width: 1%;
+}
+
+
 
 .table.clientDataTable td.x_invoice_top_td {
 	max-width: 33.3%;
@@ -179,6 +196,7 @@ form#x-invoice {
 .tax_amounts {
 	display: flex;
 	flex-direction: row;
+	align-items: center;
 	gap: 0.5em;
 }
 input#tax_amount_value {

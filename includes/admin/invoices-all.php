@@ -48,7 +48,9 @@ function xi_invoice_show_all()
                         <td><?php echo esc_html(number_format($invoice->order_total_final)); ?></td>
                         <td><?php echo esc_html($customerName); ?></td>
                         <td><?php echo esc_html($invoice->date_submit_gmt); ?></td>
-                        <td><a href="<?php echo admin_url('admin.php?page=xi-invoices&invoice_id=' . esc_attr($invoice->invoice_id)); ?>">مشاهده فاکتور</a></td>
+                        <td>
+                            <a href="<?php echo admin_url('admin.php?page=xi-invoices&invoice_id=' . esc_attr($invoice->invoice_id)); ?>">مشاهده فاکتور</a> / <a href="<?php echo admin_url('admin.php?page=xi-invoices&invoice_id=' . esc_attr($invoice->invoice_id)) . '&print_view'; ?>">نسخه نهایی</a>
+                        </td>
                     </tr>
             <?php
                 }

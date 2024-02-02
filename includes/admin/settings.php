@@ -22,8 +22,9 @@ function settings()
 {
 
     if (isset($_POST['save'])) {
-        update_option('taxAmount',          sanitize_text_field($_POST['applied-tax']));
+        update_option('taxAmount',          sanitize_text_field($_POST['applied_tax']));
         update_option('dateFormat',         sanitize_text_field($_POST['date_format']));
+        update_option('regPageSlug',        sanitize_text_field($_POST['invoice_registration_page_slug']));
 
         // Handle the logo settings
         if (isset($_POST['invoice_logo'])) {
@@ -54,17 +55,18 @@ function settings()
     wp_enqueue_media();
 
     // Retrieve current settings
-    $taxAmount = get_option('taxAmount', 'applied-tax');
-    $dateFormat = get_option('dateFormat', 'date_format');
-    $invoiceLogo = get_option('invoiceLogo', 'default_site_logo');
+    $taxAmount      = get_option('taxAmount', 'applied_tax');
+    $dateFormat     = get_option('dateFormat', 'date_format');
+    $invoiceLogo    = get_option('invoiceLogo', 'default_site_logo');
+    $regPageSlug    = get_option('regPageSlug', 'invoice_registration_page_slug');
 
 ?>
     <form action="" method="post" enctype="multipart/form-data">
         <h2>تنظیمات ثبت فاکتور ویزیتور</h2>
         <table class="form-table">
             <tr>
-                <th><label for="applied-tax">مقدار مالیت</label></th>
-                <td><input type="number" name="applied-tax" value="<?php echo $taxAmount ?>"></td>
+                <th><label for="applied_tax">مقدار مالیت</label></th>
+                <td><input type="number" name="applied_tax" value="<?php echo $taxAmount ?>"></td>
             </tr>
             <tr>
                 <th><label for="date_format">فرمت تاریخ</label></th>
@@ -95,8 +97,8 @@ function settings()
                 </td>
             </tr>
             <tr>
-                <th><label for="options4">تنظیمات چهارم</label></th>
-                <td><input disabled type="text" name="options4" value=""></td>
+                <th><label for="invoice_registration_page_slug">لینک برگه ثبت فاکتور</label></th>
+                <td><input type="text" name="invoice_registration_page_slug" value="<?php echo $regPageSlug; ?>"></td>
             </tr>
             <tr>
                 <th><label for="options5">تنظیمات پنجم</label></th>

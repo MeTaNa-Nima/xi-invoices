@@ -42,21 +42,15 @@ add_shortcode('x_invoice_details', 'x_invoice_display_invoice_details');
 function x_invoice_view_order_shortcode()
 {
     $invoices = new Xi_Invoices_Invoice();
-
-    // Get the saved logo option
-    $invoiceLogoOption = get_option('invoiceLogo', '');
-
-    // Determine the logo URL
+    $invoiceLogoOption  = get_option('invoiceLogo', '');
+    $regPageSlug        = get_option('regPageSlug');
+    $paymentMethod = '';
     $logoURL = '';
-
     if ($invoiceLogoOption === 'default_site_logo') {
-        // Use WordPress site logo
-        $logoURL = get_site_logo_url(); // Replace with appropriate function to get the site logo URL
+        $logoURL = get_site_logo_url();
     } else if (!empty($invoiceLogoOption)) {
-        // Use custom logo URL
         $logoURL = $invoiceLogoOption;
     }
-
 
     // Check if an invoice number is submitted or fetch the last invoice number
     if (isset($_POST['invoice_number']) && !empty($_POST['invoice_number'])) {
@@ -72,10 +66,15 @@ function x_invoice_view_order_shortcode()
         $returned_products = $invoices->get_product_details($invoice_number, 'returned');
 
         if ($invoice) {
+            
+            if ($invoice->payment_method === 'cash') {
+                $paymentMethod = 'نقد';
+            } elseif ($invoice->payment_method === 'cheque')  {
+                $paymentMethod = 'چک';
+            }
             $xi_invoice_view_output .= '<div class="xi-invoice-result">';
             // Header Start
             $xi_invoice_view_output .= '<div class="xi-invoice-header">';
-            // $xi_invoice_view_output .= '<div class="logo">لوگو اینجا میباشد</div>';
             $xi_invoice_view_output .= '<div class="logo"><img src="' . $logoURL . '" alt=""></div>';
             $xi_invoice_view_output .= '<div class="company-name">شرکت نیک عطرآگین پارس</div>';
             $xi_invoice_view_output .= '<div class="company-registration-number">شماره ثبت ۱۷۲۰۵</div>';
@@ -88,7 +87,7 @@ function x_invoice_view_order_shortcode()
             $xi_invoice_view_output .= '<p><b>نام مشتری:</b> ' . esc_html($invoice->customer_name) . '</p>';
             $xi_invoice_view_output .= '<p><b>نام فروشگاه:</b> ' . esc_html($invoice->customer_shop_name) . '</p>';
             $xi_invoice_view_output .= '<p><b>آدرس مشتری:</b> ' . esc_html($invoice->customer_address) . '</p>';
-            $xi_invoice_view_output .= '<p><b>نحوه پرداخت:</b> ' . esc_html($invoice->payment_method) . '</p>';
+            $xi_invoice_view_output .= '<p><b>نحوه پرداخت:</b> ' . esc_html($paymentMethod) . '</p>';
     
             $xi_invoice_view_output .= '<p class="xi-header"><b>اقلام فروخته شده:</b></p>';
             $xi_invoice_view_output .= '<table class="xi-items-list"><tr><th>نام</th><th>تعداد</th><th>قیمت</th><th>جمع</th></tr>';
@@ -107,12 +106,12 @@ function x_invoice_view_order_shortcode()
             $xi_invoice_view_output .= '<table class="xi-pricing">';
             $xi_invoice_view_output .= '<tr><td><b>جمع کل:</b></td><td class="xi-table-prices">' . esc_html(number_format($invoice->order_total_pure)) . ' ریال</td></tr>';
             if ($invoice->order_include_tax === 'yes') {
-                $xi_invoice_view_output .= '<tr><td><b>مقدار مالیات:</b></td><td class="xi-table-prices"> ' . esc_html(number_format($invoice->order_total_tax)) . ' %</td></tr>';
+                $xi_invoice_view_output .= '<tr><td><b>مقدار مالیات:</b></td><td class="xi-table-prices"> %' . esc_html(number_format($invoice->order_total_tax)) . '</td></tr>';
             }
             if ($invoice->order_include_discount === 'yes') {
-                if ($invoice->discount_method === 'درصد') {
-                    $xi_invoice_view_output .= '<tr><td><b>مقدار تخفیف:</b></td><td class="xi-table-prices"> ' . esc_html(number_format($invoice->discount_total_percentage)) . ' %</td></tr>';
-                } elseif ($invoice->discount_method === 'مبلغ ثابت') {
+                if ($invoice->discount_method === 'percent') {
+                    $xi_invoice_view_output .= '<tr><td><b>مقدار تخفیف:</b></td><td class="xi-table-prices"> %' . esc_html(number_format($invoice->discount_total_percentage)) . ' معادل ' . esc_html(number_format($invoice->discount_total_amount)) .' ریال</td></tr>';
+                } elseif ($invoice->discount_method === 'constant') {
                     $xi_invoice_view_output .= '<tr><td><b>مقدار تخفیف:</b></td><td class="xi-table-prices"> ' . esc_html(number_format($invoice->discount_total_amount)) . ' ریال</td></tr>';
                 }
             }
@@ -141,6 +140,9 @@ function x_invoice_view_order_shortcode()
     // Form HTML
     $xi_invoice_view_output .= '
     <div class="xi-invoice-view-form-controls">
+        <div class="go-back-btn">
+            <a href="' . get_site_url() . '/' . $regPageSlug . '">ثبت فاکتور جدید</a>
+        </div>
         <div class="xi-search-invoice">
             <form id="x-invoice-view" class="x-invoice-view" action="" method="post">
                 <div class="xi-invoice-search">
@@ -158,3 +160,7 @@ function x_invoice_view_order_shortcode()
     return $xi_invoice_view_output;
 }
 add_shortcode('x-invoice_view_order', 'x_invoice_view_order_shortcode');
+
+
+?>
+

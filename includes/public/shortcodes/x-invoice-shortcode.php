@@ -84,7 +84,7 @@ function x_invoice_shortcode()
                         <br>ردیف
                     </th>
                     <tr>
-                        <td class="x_invoice_table_td">
+                        <td class="x_invoice_table_td products_col">
                             <select name="custom_product_name" class="custom_product_name" id="custom_product_name">
                                 <option value="-1">-- انتخاب کنید --</option>
                                 <?php
@@ -96,9 +96,9 @@ function x_invoice_shortcode()
                                 ?>
                             </select>
                         </td>
-                        <td class="x_invoice_table_td"><input class="custom_product_amount" type="text" inputmode="numeric"></td>
-                        <td class="x_invoice_table_td"><input class="custom_product_price" type="text" inputmode="numeric"></td>
-                        <td class="x_invoice_table_td">
+                        <td class="x_invoice_table_td qty_col"><input class="custom_product_amount" type="text" inputmode="numeric"></td>
+                        <td class="x_invoice_table_td price_col"><input class="custom_product_price" type="text" inputmode="numeric"></td>
+                        <td class="x_invoice_table_td total_price_col">
                             <span class="custom_product_show_only"></span>
                             <input readonly type="hidden" class="custom_product_total" value="">
                         </td>
@@ -132,7 +132,7 @@ function x_invoice_shortcode()
                             <br>ردیف
                         </th>
                         <tr>
-                            <td class="x_invoice_table_td">
+                            <td class="x_invoice_table_td products_col">
                                 <select name="custom_product_name" class="custom_product_name" id="custom_product_name">
                                     <option value="-1">-- انتخاب کنید --</option>
                                     <?php
@@ -144,9 +144,9 @@ function x_invoice_shortcode()
                                     ?>
                                 </select>
                             </td>
-                            <td class="x_invoice_table_td"><input class="custom_product_amount" type="text" inputmode="numeric"></td>
-                            <td class="x_invoice_table_td"><input class="custom_product_price" type="text" inputmode="numeric"></td>
-                            <td class="x_invoice_table_td">
+                            <td class="x_invoice_table_td qty_col"><input class="custom_product_amount" type="text" inputmode="numeric"></td>
+                            <td class="x_invoice_table_td price_col"><input class="custom_product_price" type="text" inputmode="numeric"></td>
+                            <td class="x_invoice_table_td total_price_col">
                                 <span class="custom_product_show_only"></span>
                                 <input readonly type="hidden" class="custom_product_total" value="">
                             </td>
