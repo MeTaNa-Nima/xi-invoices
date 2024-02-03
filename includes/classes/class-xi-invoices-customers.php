@@ -28,6 +28,9 @@ class Xi_Invoices_Customers {
     public function get_customer_by_national_id($national_id) {
         return $this->wpdb->get_row($this->wpdb->prepare("SELECT * FROM $this->table_name WHERE customer_national_id = %s", $national_id));
     }
+    public function get_customer_by_mobile_no($mobile_no) {
+        return $this->wpdb->get_row($this->wpdb->prepare("SELECT * FROM $this->table_name WHERE customer_mobile_no = %s", $mobile_no));
+    }
 
     // Retrieve all customers
     public function get_all_customers() {

@@ -18,7 +18,8 @@ body, input, select, h1, h2, h3, h4, h5, h6, p {
 .x-invoice-form-inputs .x_invoice_top_td input,
 .x-invoice-form-inputs .x_invoice_table_td input,
 .x-invoice-form-inputs .x_invoice_top_td select,
-.x-invoice-form-inputs .x_invoice_table_td select {
+.x-invoice-form-inputs .x_invoice_table_td select,
+.xi_add_customer_container input {
 	width: calc(100% - 0em);
 }
 #productsList .products_col, #returned_productsList .products_col {
@@ -37,7 +38,22 @@ body, input, select, h1, h2, h3, h4, h5, h6, p {
 	width: 1%;
 }
 
-
+.xi_btn {
+    text-decoration: none;
+    border-radius: 20px;
+    padding: 10px 15px;
+    background-color: #3948ba;
+    color: #fff;
+}
+.xi_add_customer_container {
+    box-shadow: 0 0 7px 3px #cecece;
+    padding: 1em;
+    margin: 2em 1em;
+	display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1em;
+}
 
 .table.clientDataTable td.x_invoice_top_td {
 	max-width: 33.3%;

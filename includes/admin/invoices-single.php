@@ -54,7 +54,7 @@ function xi_invoice_show_single()
                                     <div>
                                         <?php
                                         echo '<p><b>نام مشتری:</b> ' . esc_html($customer_details->customer_name) . '</p>';
-                                        echo '<p><b>کد ملی:</b> ' . esc_html($customer_details->customer_national_id) . '</p>';
+                                        echo '<p><b>شماره موبایل:</b> ' . esc_html($customer_details->customer_mobile_no) . '</p>';
                                         echo '<p><b>نام فروشگاه:</b> ' . esc_html($customer_details->customer_shop_name) . '</p>';
                                         echo '<p><b>آدرس مشتری:</b> ' . esc_html($customer_details->customer_address) . '</p>';
                                         ?>

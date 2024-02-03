@@ -30,10 +30,46 @@ function x_invoice_shortcode()
         $current_date_time = date('Y/n/j H:i:s');
     }
 
+    if (isset($_POST['add_row'])) {
+        $customer_mobile_no = sanitize_text_field($_POST['new_customer_mobile_no']);
+
+        // Check if customer with the same national ID already exists
+        $mobile_no = sanitize_text_field($_POST['new_customer_mobile_no']);
+        $existing_customer = $customers->get_customer_by_mobile_no($mobile_no);
+
+        if ($existing_customer > 0) {
+            setMessage('قبل مشتری با این کد ملی ثبت شده است.');
+        } else {
+            // Insert new customer data
+            $new_data = array(
+                'customer_name'         => sanitize_text_field($_POST['new_customer_name']),
+                'customer_mobile_no'  => $customer_mobile_no,
+                'customer_address'      => sanitize_text_field($_POST['new_customer_address']),
+                'customer_shop_name'    => sanitize_text_field($_POST['new_customer_shop_name']),
+            );
+            $customers->add_customer($new_data);
+        }
+    }
+
     ob_start();
 ?>
-    <h3 class="xi-current-date">تاریخ امروز: <?php echo $today; ?></h3>
+    <form method="post" action="" id="x-invoice-customers-form">
+        <div class="xi_add_new_records">
+            <a class="xi_btn new_customer" id="new_customer" href="#">افزودن مشتری جدید</a>
+        </div>
+        <?php showMessage(); ?>
+        <div class="xi_add_customer_container" id="x-invoice-customers-table" style="display: none;">
+            <input type="text" class="customer_name" name="new_customer_name" value="" placeholder="نام مشتری" />
+            <input type="text" class="customer_mobile_no" name="new_customer_mobile_no" value="" placeholder="شماره موبایل" />
+            <input type="text" class="customer_shop_name" name="new_customer_shop_name" value="" placeholder="نام فروشگاه" />
+            <input type="text" class="customer_address" name="new_customer_address" value="" placeholder="آدرس مشتری" />
+            <input type="submit" name="add_row" value="افزودن" class="button-primary" />
+        </div>
+        <hr>
+    </form>
+
     <form id="x-invoice" class="x-invoice" action="" method="post">
+        <h3 class="xi-current-date">تاریخ امروز: <?php echo $today; ?></h3>
         <h2 class="x-invoice-title"></h2>
         <div class="x-invoice-form-inputs">
             <table class="clientDataTable">
@@ -274,7 +310,7 @@ function x_invoice_ajax_submit_invoice()
 
 
     // Prepare and sanitize product details
-    $products_details = array_map(function($product) {
+    $products_details = array_map(function ($product) {
         return array(
             'product_id'           => sanitize_text_field($product['product_id']),
             'product_qty'          => sanitize_text_field($product['quantity']),
@@ -285,7 +321,7 @@ function x_invoice_ajax_submit_invoice()
             'date_submit'          => sanitize_text_field($product['date_time'])
         );
     }, $_POST['products']);
-    
+
 
     // Add product details
     $invoice->add_product_details($invoice_id, $products_details);
@@ -296,7 +332,7 @@ function x_invoice_ajax_submit_invoice()
     wp_send_json_success(array(
         'message' => 'Invoice created successfully',
         'invoice_id' => $invoice_id,
-        'redirect_url' => home_url('/view-invoice/') 
+        'redirect_url' => home_url('/view-invoice/')
     ));
 }
 /* End Data Sending via Ajax */
@@ -309,9 +345,9 @@ function get_customer_details()
     if ($customer_id > 0) {
         $customer = $customers->get_customer($customer_id);
         if ($customer) {
-            echo json_encode(array('national_id' => $customer->customer_national_id , 'address' => $customer->customer_address, 'shop_name' => $customer->customer_shop_name));
+            echo json_encode(array('mobile_no' => $customer->customer_mobile_no, 'address' => $customer->customer_address, 'shop_name' => $customer->customer_shop_name));
         } else {
-            echo json_encode(array('national_id' => '', 'address' => '', 'shop_name' => ''));
+            echo json_encode(array('mobile_no' => '', 'address' => '', 'shop_name' => ''));
         }
     }
     wp_die();

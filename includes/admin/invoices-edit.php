@@ -104,8 +104,8 @@ function xi_invoice_edit_single()
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th>کد ملی</th>
-                                            <td class="customer_national_id"><?php echo esc_html($customer_details->customer_national_id); ?></td>
+                                            <th>شماره موبایل</th>
+                                            <td class="customer_mobile_no"><?php echo esc_html($customer_details->customer_mobile_no); ?></td>
                                         </tr>
                                         <tr>
                                             <th>نام فروشگاه</th>

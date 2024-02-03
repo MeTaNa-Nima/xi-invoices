@@ -78,7 +78,7 @@ class Xi_Invoices_Invoice {
     // Method to get invoice details by ID
     public function get_invoice_details($invoice_id) {
         return $this->wpdb->get_row($this->wpdb->prepare(
-            "SELECT op.*, c.customer_name, c.customer_national_id, c.customer_address, c.customer_shop_name, u.display_name as visitor_name
+            "SELECT op.*, c.customer_name, c.customer_national_id, c.customer_mobile_no, c.customer_address, c.customer_shop_name, u.display_name as visitor_name
             FROM {$this->operation_data_table} op
             JOIN {$this->wpdb->prefix}x_invoice_customers c ON op.customer_id = c.customer_id
             LEFT JOIN {$this->wpdb->users} u ON op.visitor_id = u.ID

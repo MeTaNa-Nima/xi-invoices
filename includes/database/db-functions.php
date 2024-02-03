@@ -31,6 +31,7 @@ function x_invoice_create_or_update_tables()
         customer_national_id varchar(255) NOT NULL,
         customer_address text NOT NULL,
         customer_shop_name varchar(255) NOT NULL,
+        customer_mobile_no varchar(255) NOT NULL,
         PRIMARY KEY  (customer_id)
     ) $charset_collate;";
 

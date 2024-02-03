@@ -161,6 +161,11 @@ jQuery(document).ready(function ($) {
 		updateInvoiceSummary(); // Call this function to recalculate the invoice summary when the checkbox is checked/unchecked
 	});
 
+	$('#new_customer').click(function(e) {
+		e.preventDefault();
+		$('.xi_add_customer_container').toggle();
+	});
+
 	// Add Remove Rows New Products
 	$(document).on("click", ".add_new_product_row", function (e) {
 		e.preventDefault();
@@ -397,7 +402,7 @@ jQuery(document).ready(function ($) {
 function fetchCustomerDetails(customerId) {
 	if (!customerId) {
 		// Clear the fields if no customer is selected
-		jQuery(".customer_national_id").text("");
+		jQuery(".customer_mobile_no").text("");
 		jQuery(".customer_shop_name").text("");
 		jQuery(".customer_address").text("");
 		return;
@@ -414,7 +419,7 @@ function fetchCustomerDetails(customerId) {
 		success: function (response) {
 			if (response) {
 				var data = JSON.parse(response);
-				jQuery(".customer_national_id").text(data.national_id);
+				jQuery(".customer_mobile_no").text(data.mobile_no);
 				jQuery(".customer_shop_name").text(data.shop_name);
 				jQuery(".customer_address").text(data.address);
 			}

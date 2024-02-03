@@ -13,16 +13,16 @@ function x_invoice_edit_customers_page()
     }
 
     if (isset($_POST['add_row'])) {
-        $customer_national_id = sanitize_text_field($_POST['new_customer_national_id']);
-        $national_id = sanitize_text_field($_POST['new_customer_national_id']);
-        $existing_customer = $customers->get_customer_by_national_id($national_id);
+        $customer_mobile_no = sanitize_text_field($_POST['new_customer_mobile_no']);
+        $mobile_no = sanitize_text_field($_POST['new_customer_mobile_no']);
+        $existing_customer = $customers->get_customer_by_mobile_no($mobile_no);
 
         if ($existing_customer > 0) {
             setMessage('قبل مشتری با این کد ملی ثبت شده است.');
         } else {
             $new_data = array(
                 'customer_name'         => sanitize_text_field($_POST['new_customer_name']),
-                'customer_national_id'  => $customer_national_id,
+                'customer_mobile_no'  => $customer_mobile_no,
                 'customer_address'      => sanitize_text_field($_POST['new_customer_address']),
                 'customer_shop_name'    => sanitize_text_field($_POST['new_customer_shop_name']),
             );
@@ -33,12 +33,12 @@ function x_invoice_edit_customers_page()
     if (isset($_POST['submit'])) {
         foreach ($_POST['customer_name'] as $row_id => $customer_name_value) {
             $sanitized_customer_name        = sanitize_text_field($customer_name_value);
-            $sanitized_customer_national_id = isset($_POST['customer_national_id'][$row_id]) ? sanitize_text_field($_POST['customer_national_id'][$row_id]) : '';
+            $sanitized_customer_mobile_no = isset($_POST['customer_mobile_no'][$row_id]) ? sanitize_text_field($_POST['customer_mobile_no'][$row_id]) : '';
             $sanitized_customer_address     = isset($_POST['customer_address'][$row_id]) ? sanitize_text_field($_POST['customer_address'][$row_id]) : '';
             $sanitized_customer_shop_name   = isset($_POST['customer_shop_name'][$row_id]) ? sanitize_text_field($_POST['customer_shop_name'][$row_id]) : '';
             $data_to_update = array(
                 'customer_name'         => $sanitized_customer_name,
-                'customer_national_id'  => $sanitized_customer_national_id,
+                'customer_mobile_no'  => $sanitized_customer_mobile_no,
                 'customer_address'      => $sanitized_customer_address,
                 'customer_shop_name'    => $sanitized_customer_shop_name,
             );
@@ -64,7 +64,7 @@ function x_invoice_edit_customers_page()
                 <tr valign="top">
                     <td></td>
                     <td class="column-column25"><input type="text" class="customer_name" name="new_customer_name" value="" /></td>
-                    <td class="column-column25"><input type="text" class="customer_national_id" name="new_customer_national_id" value="" /></td>
+                    <td class="column-column25"><input type="text" class="customer_mobile_no" name="new_customer_mobile_no" value="" /></td>
                     <td class="column-column25"><input type="text" class="customer_shop_name" name="new_customer_shop_name" value="" /></td>
                     <td class="column-column50"><input type="text" class="customer_address" name="new_customer_address" value="" /></td>
                     <td>
@@ -76,7 +76,7 @@ function x_invoice_edit_customers_page()
                     echo '<tr valign="top">' .
                         '<td class="firstCol">' . esc_attr($data->customer_id) . '</td>' .
                         '<td><input type="text" name="customer_name[' . esc_attr($data->customer_id) . ']" value="' . esc_attr($data->customer_name) . '" /></td>' .
-                        '<td><input type="text" name="customer_national_id[' . esc_attr($data->customer_id) . ']" value="' . esc_attr($data->customer_national_id) . '" /></td>' .
+                        '<td><input type="text" name="customer_mobile_no[' . esc_attr($data->customer_id) . ']" value="' . esc_attr($data->customer_mobile_no) . '" /></td>' .
                         '<td><input type="text" name="customer_shop_name[' . esc_attr($data->customer_id) . ']" value="' . esc_attr($data->customer_shop_name) . '" /></td>' .
                         '<td><input type="text" name="customer_address[' . esc_attr($data->customer_id) . ']" value="' . esc_attr($data->customer_address) . '" /></td>' .
                         '<td>' .

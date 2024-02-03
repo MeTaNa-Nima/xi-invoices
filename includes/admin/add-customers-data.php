@@ -5,11 +5,11 @@ require_once('settings.php');
 function x_invoice_add_customers_page() {
     $customers = new Xi_Invoices_Customers();
     if (isset($_POST['add_row'])) {
-        $customer_national_id = sanitize_text_field($_POST['new_customer_national_id']);
+        $customer_mobile_no = sanitize_text_field($_POST['new_customer_mobile_no']);
         
         // Check if customer with the same national ID already exists
-        $national_id = sanitize_text_field($_POST['new_customer_national_id']);
-        $existing_customer = $customers->get_customer_by_national_id($national_id);
+        $mobile_no = sanitize_text_field($_POST['new_customer_mobile_no']);
+        $existing_customer = $customers->get_customer_by_mobile_no($mobile_no);
 
         if ($existing_customer > 0) {
             setMessage('قبل مشتری با این کد ملی ثبت شده است.');
@@ -17,7 +17,7 @@ function x_invoice_add_customers_page() {
             // Insert new customer data
             $new_data = array(
                 'customer_name'         => sanitize_text_field($_POST['new_customer_name']),
-                'customer_national_id'  => $customer_national_id,
+                'customer_mobile_no'  => $customer_mobile_no,
                 'customer_address'      => sanitize_text_field($_POST['new_customer_address']),
                 'customer_shop_name'    => sanitize_text_field($_POST['new_customer_shop_name']),
             );
@@ -34,17 +34,17 @@ function x_invoice_add_customers_page() {
                 <tr valign="top">
                     <th class="firstCol" scope="row">ID</th>
                     <th scope="row">نام مشتری</th>
-                    <th scope="row">کد ملی مشتری</th>
+                    <th scope="row">شماره موبایل</th>
                     <th scope="row">نام فروشگاه</th>
                     <th scope="row">آدرس مشتری</th>
                     <th scope="row"></th>
                 </tr>
                 <tr valign="top">
                     <td></td>
-                    <td class="column"><input type="text" class="customer_name" name="new_customer_name" value="" /></td>
-                    <td class="column"><input type="text" class="customer_national_id" name="new_customer_national_id" value="" /></td>
-                    <td class="column"><input type="text" class="customer_shop_name" name="new_customer_shop_name" value="" /></td>
-                    <td class="column"><input type="text" class="customer_address" name="new_customer_address" value="" /></td>
+                    <td class="column"><input type="text" class="customer_name" name="new_customer_name" value="" placeholder="نام مشتری"/></td>
+                    <td class="column"><input type="text" class="customer_mobile_no" name="new_customer_mobile_no" value="" placeholder="شماره موبایل"/></td>
+                    <td class="column"><input type="text" class="customer_shop_name" name="new_customer_shop_name" value="" placeholder="نام فروشگاه"/></td>
+                    <td class="column"><input type="text" class="customer_address" name="new_customer_address" value="" placeholder="آدرس مشتری"/></td>
                     <td>
                         <input type="submit" name="add_row" value="افزودن" class="button-primary" />
                     </td>
@@ -54,7 +54,7 @@ function x_invoice_add_customers_page() {
                     echo '<tr valign="top">' .
                         '<td class="firstCol">' . esc_attr($data->customer_id) . '</td>' .
                         '<td class="column">' . esc_attr($data->customer_name) . '</td>' .
-                        '<td class="column">' . esc_attr($data->customer_national_id) . '</td>' .
+                        '<td class="column">' . esc_attr($data->customer_mobile_no) . '</td>' .
                         '<td class="column">' . esc_attr($data->customer_shop_name) . '</td>' .
                         '<td class="column">' . esc_attr($data->customer_address) . '</td>' .
                         '<td></td>' .
