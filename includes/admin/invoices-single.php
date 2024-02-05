@@ -319,7 +319,8 @@ function xi_invoice_show_single()
                             <?php
                             if (in_array('administrator', wp_get_current_user()->roles)) {
                             ?>
-                                <a class="button button-secondary" href="admin.php?page=xi-invoices&edit_mode=1&invoice_id=<?php echo $invoice_id; ?>">ویرایش</a>
+                                <!-- <a class="button button-secondary" href="admin.php?page=xi-invoices&edit_mode=1&invoice_id=<?php echo $invoice_id; ?>">ویرایش</a> -->
+                                / ویرایش فاکتور
                             <?php
                             }
                             ?>
