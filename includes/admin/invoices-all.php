@@ -5,7 +5,7 @@ function xi_invoice_show_all()
 {
     $all_invoices   = new Xi_Invoices_Invoice();
     $customers      = new Xi_Invoices_Customers();
-    
+
     $current_user   = wp_get_current_user();
     $subHeader = '';
 
@@ -64,7 +64,8 @@ function xi_invoice_show_all()
                     <td><?php echo esc_html($customerName); ?></td>
                     <td><?php echo esc_html($datetime->format('Y/n/j')); ?></td>
                     <td>
-                        <a href="<?php echo admin_url('admin.php?page=xi-invoices&invoice_id=' . esc_attr($invoice->invoice_id)); ?>">مشاهده فاکتور</a> / <a href="<?php echo admin_url('admin.php?page=xi-invoices&invoice_id=' . esc_attr($invoice->invoice_id)) . '&print_view'; ?>">نسخه نهایی</a>
+                        <a href="<?php echo admin_url('admin.php?page=xi-invoices&edit_mode=1&invoice_id=' . esc_attr($invoice->invoice_id)); ?>">ویرایش فاکتور</a> / 
+                        <a href="<?php echo admin_url('admin.php?page=xi-invoices&invoice_id=' . esc_attr($invoice->invoice_id)) . '&print_view'; ?>">نسخه نهایی</a>
                     </td>
                 </tr>
         <?php

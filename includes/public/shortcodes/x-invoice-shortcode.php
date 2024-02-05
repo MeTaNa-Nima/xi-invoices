@@ -85,7 +85,7 @@ function x_invoice_shortcode()
                         <td class="x_invoice_top_td">
                             <input class="current_user" readonly type="" value="<?php echo $user_display_name; ?>">
                             <input type="hidden" readonly name="" value="<?php echo $user_id; ?>">
-                            <input type="hidden" readonly id="current-date-time" class="current-date-time" name="current-date-time" value="<?php echo $current_date_time; ?>">
+                            <input type="hidden" readonly id="current_date_time" class="current_date_time" name="current_date_time" value="<?php echo $current_date_time; ?>">
                             <input type="hidden" readonly name="discount_calculated" id="discount_calculated" class="discounts discount_calculated" value="">
                         </td>
                         <td class="x_invoice_top_td">

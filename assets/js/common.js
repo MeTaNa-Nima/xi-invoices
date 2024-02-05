@@ -64,7 +64,7 @@ jQuery(document).ready(function ($) {
 	// Calculate the total of all RETURNED rows
 	function calculateInvoiceReturnedTotal() {
 		var invoiceTotalReturnedPrice = 0;
-		if ($("#include_returned_products").is(":checked")) {
+		if ($(".include_returned_products").is(":checked")) {
 			$(".returned_productsList .custom_product_total").each(function () {
 				invoiceTotalReturnedPrice += parseInputValue($(this).val());
 			});
@@ -75,51 +75,33 @@ jQuery(document).ready(function ($) {
 	// Calculate the discount amount
 	function calculateDiscount(invoiceTotal, invoiceReturnedTotal) {
 		var discountAmount = 0;
-		if ($("#invoice_discount").is(":checked")) {
-			if ($("#payment_percents").is(":checked")) {
-				var discountPercentage = parseInputValue($("#discount_percents").val());
+		if ($(".invoice_discount").is(":checked")) {
+			if ($(".payment_percents").is(":checked")) {
+				var discountPercentage = parseInputValue($(".discount_percents").val());
 				discountAmount = (invoiceTotal - invoiceReturnedTotal) * (discountPercentage / 100);
-			} else if ($("#payment_constant").is(":checked")) {
-				discountAmount = parseInputValue($("#discount_constant").val());
+			} else if ($(".payment_constant").is(":checked")) {
+				discountAmount = parseInputValue($(".discount_constant").val());
 			}
 		}
-        $('#discount_calculated').val(discountAmount);
+        $('.discount_calculated').val(discountAmount);
 		return discountAmount;
 	}
 
 	// Calculate the tax amount
 	function calculateTax(invoiceTotal, invoiceReturnedTotal) {
 		var taxAmount = 0;
-		if ($("#invoice_includes_tax").is(":checked")) {
-			var taxPercentage = parseInputValue($("#tax_amount_value").val());
+		if ($(".invoice_includes_tax").is(":checked")) {
+			var taxPercentage = parseInputValue($(".tax_amount_value").val());
 			taxAmount = (invoiceTotal - invoiceReturnedTotal) * (taxPercentage / 100);
 		}
 		return taxAmount;
 	}
 
-	// // Update the summary of the invoice
-	// function updateInvoiceSummary() {
-	//     var invoiceTotal            = calculateInvoiceTotal();
-	//     var invoiceReturnedTotal    = calculateInvoiceReturnedTotal();
-	//     var discountAmount          = calculateDiscount(invoiceTotal, invoiceReturnedTotal);
-	//     var taxAmount               = calculateTax(invoiceTotal, invoiceReturnedTotal);
-	//     var finalTotal              = invoiceTotal - invoiceReturnedTotal - discountAmount + taxAmount;
-
-	//     $(".invoice_total_pure").val(formatNumberForDisplay(invoiceTotal));
-	//     $(".invoice_total_pure_show_only").html(formatNumberForDisplay(invoiceTotal));
-
-	//     $(".invoice_total_returned_pure").val(formatNumberForDisplay(invoiceReturnedTotal));
-	//     $(".invoice_total_returned_pure_show_only").html(formatNumberForDisplay(invoiceReturnedTotal));
-
-	//     $(".invoice_total_prices").val(formatNumberForDisplay(finalTotal));
-	//     $(".invoice_total_prices_show_only").html(formatNumberForDisplay(finalTotal));
-	// }
-
 	// Update the summary of the invoice
 	function updateInvoiceSummary() {
-		var invoiceTotal = calculateInvoiceTotal();
-		var invoiceReturnedTotal = calculateInvoiceReturnedTotal();
-		var discountAmount = calculateDiscount(invoiceTotal, invoiceReturnedTotal);
+		var invoiceTotal			= calculateInvoiceTotal();
+		var invoiceReturnedTotal	= calculateInvoiceReturnedTotal();
+		var discountAmount			= calculateDiscount(invoiceTotal, invoiceReturnedTotal);
 
 		// Calculate the subtotal after discount
 		var subtotalAfterDiscount = invoiceTotal - invoiceReturnedTotal - discountAmount;
@@ -136,6 +118,7 @@ jQuery(document).ready(function ($) {
 
 		$(".invoice_total_prices").val(formatNumberForDisplay(finalTotal));
 		$(".invoice_total_prices_show_only").html(formatNumberForDisplay(finalTotal));
+		console.log('Products:' + invoiceTotal + " - Returns:" + invoiceReturnedTotal + " - Discount:" + discountAmount + " - Subtotal:" + subtotalAfterDiscount + " - Tax:" + taxAmount + " - Total:" + finalTotal);
 	}
 
     
@@ -152,7 +135,7 @@ jQuery(document).ready(function ($) {
 			updateInvoiceSummary();
 		}
 	);
-	$("#include_returned_products").change(function () {
+	$(".include_returned_products").change(function () {
 		if ($(this).is(":checked")) {
 			$(".returned_products_section").fadeIn();
 		} else {
@@ -161,7 +144,7 @@ jQuery(document).ready(function ($) {
 		updateInvoiceSummary(); // Call this function to recalculate the invoice summary when the checkbox is checked/unchecked
 	});
 
-	$('#new_customer').click(function(e) {
+	$('.new_customer').click(function(e) {
 		e.preventDefault();
 		$('.xi_add_customer_container').toggle();
 	});
@@ -169,20 +152,20 @@ jQuery(document).ready(function ($) {
 	// Add Remove Rows New Products
 	$(document).on("click", ".add_new_product_row", function (e) {
 		e.preventDefault();
-		var lastRow = $("#productsList tbody tr:last");
+		var lastRow = $(".productsList tbody tr:last");
 		var newRow = lastRow.clone();
 		newRow.find("input").val("");
 		newRow.find("select").val("-1");
 		newRow.find(".custom_product_show_only").html(""); // Clear the content of the span
-		newRow.appendTo("#productsList tbody");
+		newRow.appendTo(".productsList tbody");
 		lastRow.find(".remove_product_row").show();
 		newRow.find(".remove_product_row").show();
 		updateInvoiceSummary();
 	});
 	$(document).on("click", ".remove_product_row", function (e) {
 		e.preventDefault();
-		if ($("#productsList tbody tr").length === 1) {
-			$("#productsList .remove_product_row").hide();
+		if ($(".productsList tbody tr").length === 1) {
+			$(".productsList .remove_product_row").hide();
 		}
 		$(this).closest("tr").remove();
 		updateInvoiceSummary();
@@ -191,26 +174,26 @@ jQuery(document).ready(function ($) {
 	// Add Remove Rows Returned Products
 	$(document).on("click", ".add_new_returned_row", function (e) {
 		e.preventDefault();
-		var lastRow = $("#returned_productsList tbody tr:last");
+		var lastRow = $(".returned_productsList tbody tr:last");
 		var newRow = lastRow.clone();
 		newRow.find("input").val("");
 		newRow.find("select").val("-1");
 		newRow.find(".custom_product_show_only").html(""); // Clear the content of the span
-		newRow.appendTo("#returned_productsList tbody");
+		newRow.appendTo(".returned_productsList tbody");
 		lastRow.find(".remove_returned_row").show();
 		newRow.find(".remove_returned_row").show();
 		updateInvoiceSummary();
 	});
 	$(document).on("click", ".remove_returned_row", function (e) {
 		e.preventDefault();
-		if ($("#returned_productsList tbody tr").length === 1) {
-			$("#returned_productsList .remove_returned_row").hide();
+		if ($(".returned_productsList tbody tr").length === 1) {
+			$(".returned_productsList .remove_returned_row").hide();
 		}
 		$(this).closest("tr").remove();
 		updateInvoiceSummary();
 	});
 
-	$(".payment_discount #invoice_discount").change(function () {
+	$(".payment_discount .invoice_discount").change(function () {
 		if ($(this).is(":checked")) {
 			$(".payment_discount_method").prop("disabled", false);
 			$(".payment_discount_method").fadeIn();
@@ -220,39 +203,39 @@ jQuery(document).ready(function ($) {
 		}
 	});
 	function toggleDiscountFields() {
-		var isPercent = $(".payment_discount #payment_percents").is(":checked");
-		var isConstant = $(".payment_discount #payment_constant").is(":checked");
+		var isPercent = $(".payment_discount .payment_percents").is(":checked");
+		var isConstant = $(".payment_discount .payment_constant").is(":checked");
 		if (isPercent) {
-			$(".payment_discount #discount_percents").prop("disabled", false);
-			$(".payment_discount #discount_percents").show();
+			$(".payment_discount .discount_percents").prop("disabled", false);
+			$(".payment_discount .discount_percents").show();
 		} else {
-			$(".payment_discount #discount_percents").prop("disabled", true);
-			$(".payment_discount #discount_percents").hide();
+			$(".payment_discount .discount_percents").prop("disabled", true);
+			$(".payment_discount .discount_percents").hide();
 		}
 		if (isConstant) {
-			$(".payment_discount #discount_constant").prop("disabled", false);
-			$(".payment_discount #discount_constant").show();
+			$(".payment_discount .discount_constant").prop("disabled", false);
+			$(".payment_discount .discount_constant").show();
 		} else {
-			$(".payment_discount #discount_constant").prop("disabled", true);
-			$(".payment_discount #discount_constant").hide();
+			$(".payment_discount .discount_constant").prop("disabled", true);
+			$(".payment_discount .discount_constant").hide();
 		}
 	}
 	toggleDiscountFields();
 	$(".payment_discount_methods").change(function () {
 		toggleDiscountFields();
 	});
-	$("#invoice_discount, #invoice_includes_tax, #include_returned_products").change(
+	$(".invoice_discount, .invoice_includes_tax, .include_returned_products").change(
 		updateInvoiceSummary
 	);
 	$(
-		".payment_discount_methods, #discount_percents, #discount_constant, #include_returned_products"
+		".payment_discount_methods, .discount_percents, .discount_constant, .include_returned_products"
 	).on("input", updateInvoiceSummary);
 
 	$(".payment_method").change(function () {
 		$("#submit_invoice").toggle($(".payment_method:checked").length > 0);
 	});
 
-	$("#invoice_includes_tax").change(function () {
+	$(".invoice_includes_tax").change(function () {
 		if ($(this).is(":checked")) {
 			$(".tax_amounts").fadeIn();
 		} else {
@@ -260,7 +243,7 @@ jQuery(document).ready(function ($) {
 		}
 	});
 
-	$("#include_returned_products").change(function () {
+	$(".include_returned_products").change(function () {
 		if ($(this).is(":checked")) {
 			$(".returned_products_section").fadeIn();
 		} else {
@@ -281,7 +264,7 @@ jQuery(document).ready(function ($) {
     
         // Validate select fields for customers
         var isValid = true;
-        $('select#customer_name').each(function () {
+        $('select.customer_name').each(function () {
             if ($(this).val() === '-1') {
                 isValid = false;
                 $(this).addClass('has-error');
@@ -290,7 +273,7 @@ jQuery(document).ready(function ($) {
         });
 
         // Validate select fields for main products
-        $('#productsList select').each(function () {
+        $('.productsList select').each(function () {
             if ($(this).val() === '-1') {
                 isValid = false;
                 $(this).addClass('has-error');
@@ -299,8 +282,8 @@ jQuery(document).ready(function ($) {
         });
     
         // Validate select fields for returned products only if "include_returned_products" is checked
-        if ($('#include_returned_products').is(':checked')) {
-            $('#returned_productsList select').each(function () {
+        if ($('.include_returned_products').is(':checked')) {
+            $('.returned_productsList select').each(function () {
                 if ($(this).val() === '-1') {
                     isValid = false;
                     $(this).addClass('has-error');
@@ -318,42 +301,42 @@ jQuery(document).ready(function ($) {
         var formData = {
             'action'                    : 'x_invoice_submit_invoice',
             'security'                  : myAjax.nonce,
-            'customer_id'               : $('#customer_name').val(),
-            'date_time'                 : $('#current-date-time').val(),
-            'order_include_tax'         : $('#invoice_includes_tax').is(':checked') ? 'yes' : 'no',
-            'order_total_tax'           : $('#tax_amount_value').val(),
-            'order_include_discount'    : $('#invoice_discount').is(':checked') ? 'yes' : 'no',
+            'customer_id'               : $('select.customer_name').val(),
+            'date_time'                 : $('.current_date_time').val(),
+            'order_include_tax'         : $('.invoice_includes_tax').is(':checked') ? 'yes' : 'no',
+            'order_total_tax'           : $('.tax_amount_value').val(),
+            'order_include_discount'    : $('.invoice_discount').is(':checked') ? 'yes' : 'no',
             'discount_method'           : $('.payment_discount_methods:checked').val(),
-            'discount_total_amount'     : $('#discount_constant').val(),
-            'discount_total_percentage' : $('#discount_percents').val(),
-            'discount_calculated'       : $('#discount_calculated').val(), // Use the calculated discount
+            'discount_total_amount'     : $('.discount_constant').val(),
+            'discount_total_percentage' : $('.discount_percents').val(),
+            'discount_calculated'       : $('.discount_calculated').val(),
             'payment_method'            : $('.payment_method:checked').val(),
             'order_total_pure'          : parseInputValue($('.invoice_total_pure').val()).toString(),
             'order_total_final'         : parseInputValue($('.invoice_total_prices').val()).toString(),
-            'include_returned_products' : $('#include_returned_products').is(':checked') ? 'yes' : 'no',
+            'include_returned_products' : $('.include_returned_products').is(':checked') ? 'yes' : 'no',
             'products'                  : []
         };
 
-        $('#productsList tbody tr').each(function() {
+        $('.productsList tbody tr').each(function() {
             var productData = {
                 'product_id'        : $(this).find('.custom_product_name').val(),
                 'quantity'          : parseInputValue($(this).find('.custom_product_amount').val()),
                 'net_price'         : parseInputValue($(this).find('.custom_product_price').val()),
-                'total_price'       : $(this).find('.custom_product_total').val(),
-                'date_time'         : $('#current-date-time').val(),
+                'total_price'       : parseInputValue($(this).find('.custom_product_total').val()),
+                'date_time'         : $('.current_date_time').val(),
                 'sale_return_flag'  : 'sold' // Flag indicating the product is sold
             };
             formData.products.push(productData);
         });
         
-        if ($('#include_returned_products').is(':checked')) {
-            $('#returned_productsList tbody tr').each(function() {
+        if ($('.include_returned_products').is(':checked')) {
+            $('.returned_productsList tbody tr').each(function() {
                 var returnedProductData = {
                     'product_id'        : $(this).find('.custom_product_name').val(),
                     'quantity'          : parseInputValue($(this).find('.custom_product_amount').val()),
                     'net_price'         : parseInputValue($(this).find('.custom_product_price').val()),
                     'total_price'       : parseInputValue($(this).find('.custom_product_total').val()),
-                    'date_time'         : $('#current-date-time').val(),
+                    'date_time'         : $('.current_date_time').val(),
                     'sale_return_flag'  : 'returned' // Flag indicating the product is returned
                 };
                 formData.products.push(returnedProductData);

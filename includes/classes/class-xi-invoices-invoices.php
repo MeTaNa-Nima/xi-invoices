@@ -27,7 +27,6 @@ class Xi_Invoices_Invoice {
         foreach ($product_details as $product) {
             $product['order_id'] = $invoice_id;
             $this->wpdb->insert($this->data_lookup_table, $product);
-            
         }
     }
 
@@ -141,4 +140,17 @@ class Xi_Invoices_Invoice {
         return $this->wpdb->get_results($sql);
     }
 
+
+    // Method to update invoice
+    public function update_invoice($invoice_id, $data) {
+        return $this->wpdb->update($this->operation_data_table, $data, array('invoice_id' => $invoice_id));
+    }
+
+    // Method to update product details
+    public function update_product_details($invoice_id, $product_details) {
+        foreach ($product_details as $product) {
+            $product['order_id'] = $invoice_id;
+            $this->wpdb->insert($this->data_lookup_table, $product);
+        }
+    }
 }

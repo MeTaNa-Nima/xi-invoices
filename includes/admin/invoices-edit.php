@@ -7,7 +7,6 @@ function xi_invoice_edit_single()
     $customers      = new Xi_Invoices_Customers();
     $all_products   = (new Xi_Invoices_Products())->get_all_products();
 
-
     $allCustomers   = $customers->get_all_customers();
     $invoices       = $all_invoices->get_all_invoices();
 
@@ -17,22 +16,56 @@ function xi_invoice_edit_single()
         $products               = $invoices->get_product_details($invoice_id, 'sold');
         $returned_products      = $invoices->get_product_details($invoice_id, 'returned');
         $invoice_general_data   = $invoices->get_invoice($invoice_id);
-        // $includesReturneds      = ;
-
-
         $customer_details       = $customers->get_customer($invoice_general_data->customer_id);
-        $user_info              = get_userdata($invoice_general_data->visitor_id);
-        // $user_name              = $user_info ? $user_info->user_login : 'Unknown User';
-        // $user_link              = $user_info ? admin_url('user-edit.php?user_id=' . $invoice_general_data->visitor_id) : '#';
 
-        $marketers = new WP_User_Query(array('role' => 'marketer'));
+        $user_role_slugs = array(
+            'role__in' => array('marketer', 'administrator') // Array of roles
+        );
+        $marketers = new WP_User_Query($user_role_slugs);
         $marketer_users = $marketers->get_results();
+
+
+        // Update invoice Start
+        if (isset($_POST) && !empty($_POST) && isset($_POST['update_invoice'])) {
+            $invoice_id;
+            $invoice_data = array(
+                'visitor_id'                => $_POST['visitor'],
+                'customer_id'               => $_POST['customer_name'],
+                'order_total_pure'          => $_POST['order_total_pure'],
+                'order_total_tax'           => $_POST['order_total_tax'],
+                'discount_total_amount'     => $_POST['discount_constant'],
+                'order_total_final'         => $_POST['order_total_final'],
+                'include_returned_products' => $_POST['include_returned_products'],
+            );
+
+            $update_invoice = $invoices->update_invoice($invoice_id, $invoice_data);
+
+            if ($update_invoice === false) {
+                // Update failed
+                printf('<pre>%s</pre>', print_r($invoice_data, true));
+                echo '<br>';
+                global $wpdb;
+                echo $wpdb->last_error;
+                echo '<br>';
+                echo "Update failed";
+            } else {
+                // Update successful or no rows affected
+                echo "Update successful or no rows affected";
+                echo "<script type='text/javascript'>window.location.href = 'admin.php?page=xi-invoices&edit_mode=1&invoice_id=" . $invoice_id . ";</script>";
+            }
+        }
+        // Update invoice End
+
 
 ?>
         <?php
         if ($invoice_general_data) {
         ?>
-            <form action="" method="post">
+            <form class="x-invoice-edit" id="x-invoice-edit" action="" method="post">
+                <input style="display: none; visibility: hidden; opacity: 0;" type="checkbox" name="invoice_discount" id="invoice_discount" class="invoice_discount" checked>
+                <input style="display: none; visibility: hidden; opacity: 0;" type="radio" id="payment_constant" class="payment_discount_methods payment_constant" name="payment_discount_methods" value="constant" checked>
+                <input style="display: none; visibility: hidden; opacity: 0;" type="checkbox" name="invoice_includes_tax" id="invoice_includes_tax" class="invoice_includes_tax" checked>
+
                 <div id="poststuff">
                     <div id="post-body" class="metabox-holder columns-2">
                         <div id="postbox-container-2" class="postbox-container">
@@ -71,7 +104,7 @@ function xi_invoice_edit_single()
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th><label for="tax_amount_value">مقدار تخفیف (ریال)</label></th>
+                                            <th><label for="payment_constant">مقدار تخفیف (ریال)</label></th>
                                             <td>
                                                 <input readonly type="text" id="payment_constant" class="payment_discount_methods payment_constant" name="payment_discount_methods" value="<?php echo esc_html(number_format($invoice_general_data->discount_total_amount)); ?>" inputmode="numeric">
                                             </td>
@@ -273,20 +306,23 @@ function xi_invoice_edit_single()
                                             <td class="label"><label for="tax_amount">درصد مالیات معادل:</label></td>
                                             <td width="1%"></td>
                                             <td class="total">
-                                                <input type="number" name="tax_amount_value" id="tax_amount_value" class="tax tax_amount_value" value="<?php echo esc_html(number_format($invoice_general_data->order_total_tax)); ?>">
+                                                %<?php echo esc_html(number_format($invoice_general_data->order_total_tax)); ?>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td class="label">تخفیف:</td>
                                             <td width="1%"></td>
                                             <td class="total">
-                                                <input type="number" name="discount_constant" id="discount_constant" class="discounts discount_constant" value="<?php echo esc_html(number_format($invoice_general_data->discount_total_amount)); ?>" placeholder="مبلغ تخفیف را وارد نمایید.">
+                                                <input type="number" name="discount_constant" id="discount_constant" class="discounts discount_constant" value="<?php echo esc_html($invoice_general_data->discount_total_amount); ?>" placeholder="مقدار فعلی: <?php echo esc_html(number_format($invoice_general_data->discount_total_amount)); ?>">
                                             </td>
                                         </tr>
                                         <tr>
                                             <td class="label">جمع کل نهایی:</td>
                                             <td width="1%"></td>
-                                            <td class="total"><?php echo esc_html(number_format($invoice_general_data->order_total_final)); ?></td>
+                                            <td class="total">
+                                                <span class="invoice_total_prices_show_only"><?php echo esc_html(number_format($invoice_general_data->order_total_final)); ?> ریال</span>
+                                                <input readonly type="hidden" name="invoice_total_prices" class="invoice_total_prices" value=""> ریال
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -295,7 +331,7 @@ function xi_invoice_edit_single()
                         <div id="postbox-container-1" class="postbox-container">
                             <div class="postbox">
                                 <a class="button button-secondary" href="admin.php?page=xi-invoices&invoice_id=<?php echo $invoice_id; ?>">بازگشت</a>
-                                <input class="button button-primary" type="submit" value="ذخیره">
+                                <input class="button button-primary" name="update_invoice" type="submit" value="ذخیره">
                             </div>
                         </div>
                     </div>
@@ -312,5 +348,6 @@ function xi_invoice_edit_single()
     <?php showMessage(); ?>
     </div>
 <?php
+
+
 }
-?>
