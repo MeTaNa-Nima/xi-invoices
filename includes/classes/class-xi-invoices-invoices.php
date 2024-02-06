@@ -20,7 +20,7 @@ class Xi_Invoices_Invoice {
 
     // Method to get the ID of the last inserted invoice
     public function get_last_inserted_invoice_id() {
-        return $this->wpdb->get_var("SELECT MAX(invoice_id) FROM {$this->operation_data_table}");
+        return $this->wpdb->get_var("SELECT invoice_id FROM {$this->operation_data_table} ORDER BY invoice_id DESC LIMIT 1");
     }
 
     public function add_product_details($invoice_id, $product_details) {

@@ -18,11 +18,11 @@ function x_invoice_edit_customers_page()
         $existing_customer = $customers->get_customer_by_mobile_no($mobile_no);
 
         if ($existing_customer > 0) {
-            setMessage('قبل مشتری با این کد ملی ثبت شده است.');
+            setMessage('قبلا مشتری با این شماره موبایل ثبت شده است.');
         } else {
             $new_data = array(
                 'customer_name'         => sanitize_text_field($_POST['new_customer_name']),
-                'customer_mobile_no'  => $customer_mobile_no,
+                'customer_mobile_no'    => $customer_mobile_no,
                 'customer_address'      => sanitize_text_field($_POST['new_customer_address']),
                 'customer_shop_name'    => sanitize_text_field($_POST['new_customer_shop_name']),
             );
@@ -38,7 +38,7 @@ function x_invoice_edit_customers_page()
             $sanitized_customer_shop_name   = isset($_POST['customer_shop_name'][$row_id]) ? sanitize_text_field($_POST['customer_shop_name'][$row_id]) : '';
             $data_to_update = array(
                 'customer_name'         => $sanitized_customer_name,
-                'customer_mobile_no'  => $sanitized_customer_mobile_no,
+                'customer_mobile_no'    => $sanitized_customer_mobile_no,
                 'customer_address'      => $sanitized_customer_address,
                 'customer_shop_name'    => $sanitized_customer_shop_name,
             );
@@ -56,7 +56,7 @@ function x_invoice_edit_customers_page()
                 <tr valign="top">
                     <th class="firstCol" scope="row">ID</th>
                     <th scope="row">نام مشتری</th>
-                    <th scope="row">کد ملی مشتری</th>
+                    <th scope="row">شماره موبایل</th>
                     <th scope="row">نام فروشگاه</th>
                     <th scope="row">آدرس مشتری</th>
                     <th scope="row"></th>

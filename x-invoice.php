@@ -2,10 +2,10 @@
 /*
 Plugin Name: X-Invoice
 Description: This is a Invoice WordPress plugin.
-Version: 1.1.4
+Version: 1.1.5
 Author: Nima Amani <metananima@gmail.com>
 */
-define('X_INVOICE_VERSION', '1.1.4');
+define('X_INVOICE_VERSION', '1.1.5');
 define('X_INVOICE_PLUGIN_URL', plugin_dir_url(__FILE__));
 require_once plugin_dir_path(__FILE__) . 'includes/database/db-functions.php';
 
@@ -226,6 +226,14 @@ add_action('admin_enqueue_scripts', 'x_invoice_enqueue_scripts');
 
 
 
+function xi_hide_admin_bar_for_marketers($show_admin_bar) {
+    $user = wp_get_current_user();
+    if (in_array('marketer', $user->roles)) {
+        return false; // Hide admin bar
+    }
+    return $show_admin_bar; // Otherwise, show admin bar as usual
+}
+add_filter('show_admin_bar', 'xi_hide_admin_bar_for_marketers');
 
 
 

@@ -15,10 +15,12 @@ function x_invoice_shortcode()
     $customers          = new Xi_Invoices_Customers();
 
     $products_data      = $products->get_all_products();
-    $customers_data     = $customers->get_all_customers();
+    
 
     $taxAmount          = get_option('taxAmount', 'applied-tax');
     $dateFormat         = get_option('dateFormat', 'date_format');
+    $regPageSlug        = get_option('regPageSlug');
+
     $current_user       = wp_get_current_user();
     $user_id            = $current_user->ID;
     $user_display_name  = $current_user->display_name;
@@ -38,18 +40,20 @@ function x_invoice_shortcode()
         $existing_customer = $customers->get_customer_by_mobile_no($mobile_no);
 
         if ($existing_customer > 0) {
-            setMessage('قبل مشتری با این کد ملی ثبت شده است.');
+            setMessage('قبل مشتری با این شماره موبایل ثبت شده است.');
         } else {
             // Insert new customer data
             $new_data = array(
                 'customer_name'         => sanitize_text_field($_POST['new_customer_name']),
-                'customer_mobile_no'  => $customer_mobile_no,
+                'customer_mobile_no'    => $customer_mobile_no,
                 'customer_address'      => sanitize_text_field($_POST['new_customer_address']),
                 'customer_shop_name'    => sanitize_text_field($_POST['new_customer_shop_name']),
             );
             $customers->add_customer($new_data);
+            echo '<script type="text/javascript">location.href = "' . $regPageSlug. '";</script>';
         }
     }
+    $customers_data     = $customers->get_all_customers();
 
     ob_start();
 ?>

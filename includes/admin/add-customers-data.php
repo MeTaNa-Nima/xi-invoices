@@ -17,7 +17,7 @@ function x_invoice_add_customers_page() {
             // Insert new customer data
             $new_data = array(
                 'customer_name'         => sanitize_text_field($_POST['new_customer_name']),
-                'customer_mobile_no'  => $customer_mobile_no,
+                'customer_mobile_no'    => $customer_mobile_no,
                 'customer_address'      => sanitize_text_field($_POST['new_customer_address']),
                 'customer_shop_name'    => sanitize_text_field($_POST['new_customer_shop_name']),
             );
