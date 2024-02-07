@@ -137,7 +137,6 @@ function x_invoice_view_order_shortcode()
     }
 
 
-
     // Form HTML
     $xi_invoice_view_output .= '
     <div class="xi-invoice-view-form-controls">
@@ -148,14 +147,14 @@ function x_invoice_view_order_shortcode()
         <div class="xi-search-invoice">
             <form id="x-invoice-view" class="x-invoice-view" action="" method="post">
                 <div class="xi-invoice-search">
-                    <input type="number" name="invoice_number" id="invoice_number" placeholder="جستجو بر اساس شماره فغازه فاکتور">
+                    <input type="number" name="invoice_number" id="invoice_number" placeholder="جستجو بر اساس شماره فاکتور">
                     <input type="submit" id="search_invoice" value="جستجو">
                 </div>
             </form>
         </div>
         <div class="xi-print-invoice">
             <a class="xi-invoice-print" onClick="window.print()">چاپ فاکتور</a>
-            <a class="xi-invoice-save-pdf">ذخیره pdf در سایت</a>
+            <a href="#" class="xi-invoice-save-pdf" data-invoice-id="' .$invoice_number . '">ذخیره pdf در سایت</a>
         </div>
     </div>';
 

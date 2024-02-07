@@ -239,38 +239,70 @@ add_filter('show_admin_bar', 'xi_hide_admin_bar_for_marketers');
 
 
 // PDF Creation
-add_action('wp_ajax_generate_invoice_pdf', 'generate_invoice_pdf');
-function generate_invoice_pdf()
-{
-    global $wpdb;
+function generate_invoice_pdf() {
+    // Check for nonce for security here (if you passed it in AJAX call)
+    // if ( !wp_verify_nonce( $_POST['nonce'], 'generate_pdf_nonce' ) ) {
+    //     wp_send_json_error( array( 'message' => 'Nonce verification failed.' ) );
+    //     return;
+    // }
+
+    // Ensure the current user has the capability to generate PDFs
+    if ( !current_user_can( 'edit_posts' ) ) {
+        wp_send_json_error( array( 'message' => 'Insufficient permissions.' ) );
+        return;
+    }
+
     $invoice_id = isset($_POST['invoice_id']) ? intval($_POST['invoice_id']) : 0;
+    if (!$invoice_id) {
+        wp_send_json_error(array('message' => 'Invalid Invoice ID.'));
+        return;
+    }
 
-    // Fetch the invoice data just like in your shortcode
-    // ...
+    // Fetch the invoice details
+    $invoices = new Xi_Invoices_Invoice();
+    $invoice_details = $invoices->get_invoice_details($invoice_id);
+    if ( !$invoice_details ) {
+        wp_send_json_error(array('message' => 'Invoice details not found.'));
+        return;
+    }
 
-    // Initialize DOMPDF
+    // Assuming you've properly included the DOMPDF library
     require_once plugin_dir_path(__FILE__) . 'vendor/autoload.php';
     $dompdf = new Dompdf\Dompdf();
 
-    // Generate the HTML for the invoice
-    $html = 'TEST TEST TEST'; // Your HTML content goes here. You can use ob_start() and ob_get_clean() to capture output from includes
+    // Construct the HTML for the invoice
+    ob_start();
+    // Include a separate PHP file here if you prefer to keep the HTML structure apart
+    echo '<h1>Invoice Details for ID: ' . esc_html($invoice_id) . '</h1>';
+    // Build your HTML content here based on $invoice_details
+    $html = ob_get_clean();
 
-    // Load the HTML and render the PDF
     $dompdf->loadHtml($html);
     $dompdf->setPaper('A4', 'portrait');
     $dompdf->render();
 
-    // Save the PDF to the server
-    $pdf_output = $dompdf->output();
-    $pdf_dir_path = wp_upload_dir()['basedir'] . '/invoices/';
-    $pdf_file_path = $pdf_dir_path . 'xi-invoice-' . $invoice_id . '.pdf';
-
-    if (!file_exists($pdf_dir_path)) {
-        mkdir($pdf_dir_path, 0777, true);
+    // Define the PDF file path
+    $upload_dir = wp_upload_dir();
+    $pdf_dir_path = trailingslashit( $upload_dir['basedir'] ) . 'invoices/';
+    if ( ! file_exists( $pdf_dir_path ) ) {
+        wp_mkdir_p( $pdf_dir_path );
     }
 
-    file_put_contents($pdf_file_path, $pdf_output);
+    // Generate the unique filename for the PDF
+    $filename_base = tr_num(jdate('Ymd')) . $invoice_id;
+    $counter = 1;
+    do {
+        $pdf_filename = $filename_base . str_pad($counter, 2, '0', STR_PAD_LEFT) . '.pdf';
+        $pdf_file_path = $pdf_dir_path . $pdf_filename;
+        $counter++;
+    } while (file_exists($pdf_file_path));
 
-    // Send a response
-    wp_send_json_success(array('message' => 'PDF generated successfully', 'pdf_url' => $pdf_file_path));
+    file_put_contents($pdf_file_path, $dompdf->output());
+
+    $pdf_url = trailingslashit( $upload_dir['baseurl'] ) . 'invoices/' . $pdf_filename;
+    wp_send_json_success(array('message' => 'PDF generated successfully', 'pdf_url' => $pdf_url));
 }
+add_action('wp_ajax_generate_invoice_pdf', 'generate_invoice_pdf');
+// Uncomment the next line to allow non-logged-in users to access this AJAX action
+// add_action('wp_ajax_nopriv_generate_invoice_pdf', 'generate_invoice_pdf');
+
