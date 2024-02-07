@@ -59,6 +59,7 @@ function x_invoice_view_order_shortcode()
         $invoice_number = $invoices->get_last_inserted_invoice_id();   
     }
 
+    ob_start();
     $xi_invoice_view_output = '<div class="xi-invoice-view">';
     if ($invoice_number) {
         $invoice = $invoices->get_invoice_details($invoice_number);
@@ -157,6 +158,7 @@ function x_invoice_view_order_shortcode()
             <a href="#" class="xi-invoice-save-pdf" data-invoice-id="' .$invoice_number . '">ذخیره pdf در سایت</a>
         </div>
     </div>';
+    $xi_invoice_view_output .= ob_get_clean();
 
     return $xi_invoice_view_output;
 }

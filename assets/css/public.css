@@ -6,7 +6,7 @@
 }
 @font-face {
     font-family: 'IRANSansFaNum';
-    src: url('../fonts/IRANSansFaNum.woff') format('woff');
+    src: url('../fonts/IranSansFaNum.ttf') format('truetype');;
     font-weight: normal;
     font-style: normal;
 }
