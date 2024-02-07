@@ -32,8 +32,11 @@ function x_invoice_create_or_update_tables()
         customer_address text NOT NULL,
         customer_shop_name varchar(255) NOT NULL,
         customer_mobile_no varchar(255) NOT NULL,
-        PRIMARY KEY  (customer_id)
+        visitor_id bigint(20) unsigned NOT NULL,
+        PRIMARY KEY  (customer_id),
+        FOREIGN KEY (visitor_id) REFERENCES {$wpdb->prefix}users(ID) ON DELETE CASCADE
     ) $charset_collate;";
+    
 
     // Table for invoice_operation_data
     $sql_operation_data = "CREATE TABLE $operation_data_table (
@@ -52,6 +55,7 @@ function x_invoice_create_or_update_tables()
         order_total_final decimal(60,0) NOT NULL,
         visitor_id mediumint(9) NOT NULL,
         include_returned_products varchar(50) NOT NULL,
+        invoice_notes text NOT NULL,
         PRIMARY KEY  (invoice_id),
         FOREIGN KEY (customer_id) REFERENCES $customers_table(customer_id)
     ) $charset_collate;";

@@ -15,7 +15,7 @@ function x_invoice_shortcode()
     $customers          = new Xi_Invoices_Customers();
 
     $products_data      = $products->get_all_products();
-    
+
 
     $taxAmount          = get_option('taxAmount', 'applied-tax');
     $dateFormat         = get_option('dateFormat', 'date_format');
@@ -50,7 +50,7 @@ function x_invoice_shortcode()
                 'customer_shop_name'    => sanitize_text_field($_POST['new_customer_shop_name']),
             );
             $customers->add_customer($new_data);
-            echo '<script type="text/javascript">location.href = "' . $regPageSlug. '";</script>';
+            echo '<script type="text/javascript">location.href = "' . $regPageSlug . '";</script>';
         }
     }
     $customers_data     = $customers->get_all_customers();
@@ -260,6 +260,8 @@ function x_invoice_shortcode()
                 </div>
             </div>
             <hr>
+            <textarea name="invoice_notes" class="invoice_notes" id="invoice_notes" cols="" rows="5"></textarea>
+            <hr>
             <div class="submit-section">
                 <input type="submit" id="submit_invoice" name="submit" class="button-primary" value="ثبت فاکتور" style="display: none;">
                 <div class="xi-form-error-msg"></div>
@@ -291,6 +293,7 @@ function x_invoice_ajax_submit_invoice()
     $order_total_final          = sanitize_text_field($_POST['order_total_final']);
     $visitor_id                 = get_current_user_id();
     $include_returned_products  = sanitize_text_field($_POST['include_returned_products']);
+    $invoice_notes              = sanitize_text_field($_POST['invoice_notes']);
 
     // Insert data into invoice_operation_data
     $operation_data = array(
@@ -307,6 +310,7 @@ function x_invoice_ajax_submit_invoice()
         'order_total_final'         => $order_total_final,
         'visitor_id'                => $visitor_id,
         'include_returned_products' => $include_returned_products,
+        'invoice_notes'             => $invoice_notes
     );
 
     $invoice = new Xi_Invoices_Invoice();

@@ -13,6 +13,7 @@ class Xi_Invoices_Customers {
 
     // Add a new customer
     public function add_customer($data) {
+        $data['visitor_id'] = get_current_user_id();
         return $this->wpdb->insert($this->table_name, $data);
     }
 
@@ -34,7 +35,8 @@ class Xi_Invoices_Customers {
 
     // Retrieve all customers
     public function get_all_customers() {
-        return $this->wpdb->get_results("SELECT * FROM $this->table_name");
+        $visitor_id = get_current_user_id();
+        return $this->wpdb->get_results($this->wpdb->prepare("SELECT * FROM $this->table_name WHERE visitor_id = %d", $visitor_id));
     }
     
 

@@ -42,7 +42,6 @@ class Xi_Invoices_Invoice {
         );
     }
 
-
     // Getting Data
     public function get_invoice($invoice_id) {
         $invoice = $this->wpdb->get_row($this->wpdb->prepare("SELECT * FROM $this->operation_data_table WHERE invoice_id = %d", $invoice_id));
@@ -72,7 +71,6 @@ class Xi_Invoices_Invoice {
 
         return $customer_details ?: null; // Return the customer details or null if not found
     }
-
 
     // Method to get invoice details by ID
     public function get_invoice_details($invoice_id) {
@@ -140,7 +138,6 @@ class Xi_Invoices_Invoice {
         return $this->wpdb->get_results($sql);
     }
 
-
     // Method to update invoice
     public function update_invoice($invoice_id, $data) {
         return $this->wpdb->update($this->operation_data_table, $data, array('invoice_id' => $invoice_id));
@@ -152,5 +149,24 @@ class Xi_Invoices_Invoice {
             $product['order_id'] = $invoice_id;
             $this->wpdb->insert($this->data_lookup_table, $product);
         }
+    }
+
+    // Method to get invoices by a specific customer ID
+    public function get_invoices_by_customer_id($customer_id, $page_number = 1, $per_page = 20) {
+        $offset = ($page_number - 1) * $per_page;
+        $sql = $this->wpdb->prepare(
+            "SELECT * FROM {$this->operation_data_table} WHERE customer_id = %d ORDER BY invoice_id DESC LIMIT %d, %d",
+            $customer_id, $offset, $per_page
+        );
+        return $this->wpdb->get_results($sql);
+    }
+
+    // Method to get the total count of invoices for a specific customer
+    public function get_total_invoices_count_by_customer($customer_id) {
+        $sql = $this->wpdb->prepare(
+            "SELECT COUNT(*) FROM {$this->operation_data_table} WHERE customer_id = %d",
+            $customer_id
+        );
+        return (int) $this->wpdb->get_var($sql);
     }
 }

@@ -85,6 +85,7 @@ function x_invoice_view_order_shortcode()
             $xi_invoice_view_output .= '<p><b>تاریخ ثبت:</b> ' . esc_html($datetime->format('Y/n/j')) . '</p>';
             $xi_invoice_view_output .= '<p><b>نام ویزیتور:</b> ' . esc_html($invoice->visitor_name) . '</p>';
             $xi_invoice_view_output .= '<p><b>نام مشتری:</b> ' . esc_html($invoice->customer_name) . '</p>';
+            $xi_invoice_view_output .= '<p><b>شماره مشتری:</b> ' . esc_html($invoice->customer_mobile_no) . '</p>';
             $xi_invoice_view_output .= '<p><b>نام فروشگاه:</b> ' . esc_html($invoice->customer_shop_name) . '</p>';
             $xi_invoice_view_output .= '<p><b>آدرس مشتری:</b> ' . esc_html($invoice->customer_address) . '</p>';
             $xi_invoice_view_output .= '<p><b>نحوه پرداخت:</b> ' . esc_html($paymentMethod) . '</p>';
@@ -142,18 +143,19 @@ function x_invoice_view_order_shortcode()
     <div class="xi-invoice-view-form-controls">
         <div class="go-back-btn">
             <a href="' . get_site_url() . '/' . $regPageSlug . '">ثبت فاکتور جدید</a>
+            <a href="' . get_site_url() . '/' . 'wp-admin/admin.php?page=xi-invoices' . '" target="_blank">فاکتور های من</a>
         </div>
         <div class="xi-search-invoice">
             <form id="x-invoice-view" class="x-invoice-view" action="" method="post">
                 <div class="xi-invoice-search">
-                    <input type="number" name="invoice_number" id="invoice_number" placeholder="Enter Invoice Number">
+                    <input type="number" name="invoice_number" id="invoice_number" placeholder="جستجو بر اساس شماره فغازه فاکتور">
                     <input type="submit" id="search_invoice" value="جستجو">
                 </div>
             </form>
         </div>
         <div class="xi-print-invoice">
-            <button onClick="window.print()">چاپ فاکتور</button>
-            <button class="xi-invoice-save-pdf">ذخیره pdf در سایت</button>
+            <a class="xi-invoice-print" onClick="window.print()">چاپ فاکتور</a>
+            <a class="xi-invoice-save-pdf">ذخیره pdf در سایت</a>
         </div>
     </div>';
 

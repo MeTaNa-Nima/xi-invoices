@@ -6,36 +6,56 @@ function xi_invoice_show_all()
     $all_invoices   = new Xi_Invoices_Invoice();
     $customers      = new Xi_Invoices_Customers();
 
+    $customers_data = $customers->get_all_customers();
+    $selected_customer_id = isset($_GET['customer_id']) ? intval($_GET['customer_id']) : -1;
     $current_user   = wp_get_current_user();
     $subHeader = '';
-
-
     // Determine the current page and set the number of items per page
     $per_page = 20;
     $current_page = isset($_GET['paged']) ? max(1, intval($_GET['paged'])) : 1;
-    // Fetch paginated invoices
-    $invoices = $all_invoices->get_paginated_invoices($current_page, $per_page);
-    $total_invoices = $all_invoices->get_total_invoices_count();
-    $total_pages = ceil($total_invoices / $per_page);
-
-
 
     // Check if current user is an administrator
     if (in_array('administrator', $current_user->roles)) {
-        // Admins can see all invoices
-        $invoices = $all_invoices->get_paginated_invoices($current_page);
-        $total_invoices = $all_invoices->get_total_invoices_count();
         $subHeader = 'همه ویزیتور ها';
+    } else {
+        $subHeader = 'شما';
+    }
+
+    // Modify invoice query based on selected customer
+    if ($selected_customer_id !== -1) {
+        $invoices = $all_invoices->get_invoices_by_customer_id($selected_customer_id, $current_page, $per_page);
+        $total_invoices = $all_invoices->get_total_invoices_count_by_customer($selected_customer_id);
+    } elseif (in_array('administrator', $current_user->roles)) {
+        // Admins can see all invoices
+        $invoices = $all_invoices->get_paginated_invoices($current_page, $per_page);
+        $total_invoices = $all_invoices->get_total_invoices_count();
     } else {
         // Other users see only their invoices
         $invoices = $all_invoices->get_invoices_by_user_id($current_user->ID, $current_page, $per_page);
         $total_invoices = $all_invoices->get_total_invoices_count_by_user($current_user->ID);
-        $subHeader = 'شما';
     }
+
+    $total_pages = ceil($total_invoices / $per_page);
 
 
 ?>
     <h2>فاکتور های ثبت شده توسط <?php echo esc_html($subHeader); ?>:</h2>
+    <div class="customers_filter">
+        <label for="customer_name">فیلتر بر اساس مشتری:</label>
+        <select name="customer_name" class="customer_name" id="customer_name" onChange="window.location.href = 'admin.php?page=xi-invoices&customer_id=' + this.value;">
+            <option value="-1">— نمایش همه —</option>
+            <?php
+            foreach ($customers_data as $data) {
+                $selected = ($data->customer_id == $selected_customer_id) ? 'selected' : '';
+            ?>
+                <option value="<?php echo esc_attr($data->customer_id); ?>" <?php echo $selected; ?>>
+                    <?php echo esc_html($data->customer_name); ?>
+                </option>
+            <?php
+            }
+            ?>
+        </select>
+    </div>
     <table class="form-table striped table-view-list widefat wp-list-table" id="form-table striped widefat fixed">
         <tr>
             <th>شناسه</th>
@@ -72,7 +92,7 @@ function xi_invoice_show_all()
                         <?php
                         }
                         ?>
-                        <a href="<?php echo admin_url('admin.php?page=xi-invoices&invoice_id=' . esc_attr($invoice->invoice_id)) . '&print_view'; ?>">نسخه نهایی</a>
+                        <a href="<?php echo admin_url('admin.php?page=xi-invoices&invoice_id=' . esc_attr($invoice->invoice_id)) . '&print_view'; ?>">مشاهده فاکتور</a>
                     </td>
                 </tr>
         <?php
@@ -102,6 +122,9 @@ function xi_invoice_show_all()
     ?>
     <?php showMessage(); ?>
     </div>
+    <script>
+
+    </script>
 <?php
 }
 ?>

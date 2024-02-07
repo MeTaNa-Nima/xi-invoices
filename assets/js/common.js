@@ -314,6 +314,7 @@ jQuery(document).ready(function ($) {
             'order_total_pure'          : parseInputValue($('.invoice_total_pure').val()).toString(),
             'order_total_final'         : parseInputValue($('.invoice_total_prices').val()).toString(),
             'include_returned_products' : $('.include_returned_products').is(':checked') ? 'yes' : 'no',
+			'invoice_notes'             : $('.invoice_notes').val(),
             'products'                  : []
         };
 
