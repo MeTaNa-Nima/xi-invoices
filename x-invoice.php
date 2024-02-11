@@ -34,6 +34,7 @@ require_once plugin_dir_path(__FILE__) . 'includes/admin/invoices.php';
 require_once plugin_dir_path(__FILE__) . 'includes/admin/invoices-all.php';
 require_once plugin_dir_path(__FILE__) . 'includes/admin/invoices-single.php';
 require_once plugin_dir_path(__FILE__) . 'includes/admin/invoices-edit.php';
+
 require_once plugin_dir_path(__FILE__) . 'vendor/autoload.php';
 
 
@@ -257,23 +258,60 @@ add_filter('show_admin_bar', 'xi_hide_admin_bar_for_marketers');
 // PDF Creation
 function generate_invoice_pdf()
 {
-    // Check for nonce for security here (if you passed it in AJAX call)
-    // if ( !wp_verify_nonce( $_POST['nonce'], 'generate_pdf_nonce' ) ) {
-    //     wp_send_json_error( array( 'message' => 'Nonce verification failed.' ) );
-    //     return;
-    // }
-
     // Ensure the current user has the capability to generate PDFs
     if (!current_user_can('edit_posts')) {
         wp_send_json_error(array('message' => 'Insufficient permissions.'));
         return;
     }
-
     $invoice_id = isset($_POST['invoice_id']) ? intval($_POST['invoice_id']) : 0;
     if (!$invoice_id) {
         wp_send_json_error(array('message' => 'Invalid Invoice ID.'));
         return;
     }
+    require_once plugin_dir_path(__FILE__) . 'vendor/autoload.php';
+
+
+
+
+    ////////////////// PDF TEST START //////////////////
+
+    $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+
+    // Specify the path to your TTF font
+    $fontPath = plugin_dir_path(__FILE__) . 'assets/fonts/IranSansFaNum.ttf';
+
+    // Convert and add the font to TCPDF
+    $fontname = TCPDF_FONTS::addTTFfont($fontPath, 'TrueTypeUnicode', '', 96);
+
+    // Set document information
+    $pdf->SetCreator(PDF_CREATOR);
+    $pdf->SetAuthor('Your Name');
+    $pdf->SetTitle('Invoice');
+    $pdf->SetSubject('Invoice PDF');
+
+    // Set default monospaced font
+    $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+
+    // Set margins
+    $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+    $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
+    $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+
+    // Set auto page breaks
+    $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+
+    // Set font
+    // $pdf->SetFont('freeserif', '', 12); // TCPDF supports "freeserif" for complex scripts like Persian
+
+    // Add a page
+    // $pdf->AddPage();
+
+
+    $pdf->SetFont($fontname, '', 12);
+    $pdf->AddPage();
+    $pdf->Write(0, '', '', 0, 'L', true, 0, false, false, 0);
+
+    ////////////////// PDF TEST END //////////////////
 
 
     // Fetch the invoice details
@@ -295,91 +333,97 @@ function generate_invoice_pdf()
         return;
     }
 
-    // Assuming you've properly included the DOMPDF library
-    require_once plugin_dir_path(__FILE__) . 'vendor/autoload.php';
-    $dompdf = new Dompdf\Dompdf();
-    // Set up the font
-    $fontDir = plugin_dir_path(__FILE__) . 'fonts'; // Path to the fonts directory
-    $fontFile = $fontDir . '/IranSansFaNum.ttf'; // Path to the IranSansFaNum font file
-    // Register the font with DOMPDF
-    $dompdf->getOptions()->setChroot(realpath($fontDir));
-    $dompdf->getOptions()->setFontDir($fontDir);
-    $dompdf->getOptions()->setFontCache($fontDir);
-    $dompdf->getFontMetrics()->registerFont('IranSansFaNum', 'normal', $fontFile);
 
-    // Construct the HTML for the invoice
-    // ob_start();
+
+    // Prepare HTML content
+    $html = '<!DOCTYPE html>
+     <html dir="rtl" lang="fa-IR">
+     <head>
+         <meta charset="UTF-8">
+         
+         <link rel="stylesheet" href="' . plugin_dir_url(__FILE__) . 'assets/css/public.css">
+         <style>
+             @font-face {
+                 font-family: "IranSansFaNum";
+                 src: url("' . plugin_dir_url(__FILE__) . 'assets/fonts/IranSansFaNum.ttf") format("truetype");
+             }
+             body, p, div, span, table, thead, tbody, tfoot, tr, th, td {
+                 font-family: "IranSansFaNum", sans-serif !important;
+                 direction: rtl !important;
+                 text-align: right !important;
+
+             }
+         </style>
+     </head>
+     <body>';
     // Include a separate PHP file here if you prefer to keep the HTML structure apart
-    $xi_invoice_pdf_output = '<h1>Invoice Details for ID: ' . esc_html($invoice_id) . '</h1>';
-    $xi_invoice_pdf_output .= 'hiii';
     if ($invoice->payment_method === 'cash') {
         $paymentMethod = 'نقد';
     } elseif ($invoice->payment_method === 'cheque') {
         $paymentMethod = 'چک';
     }
-    $xi_invoice_pdf_output .= '<div class="xi-invoice-result">';
+    $html .= '<div class="xi-invoice-result">';
     // Header Start
-    $xi_invoice_pdf_output .= '<div class="xi-invoice-header">';
-    $xi_invoice_pdf_output .= '<div class="logo"><img src="' . $logoURL . '" alt=""></div>';
-    $xi_invoice_pdf_output .= '<div class="company-name">شرکت نیک عطرآگین پارس</div>';
-    $xi_invoice_pdf_output .= '<div class="company-registration-number">شماره ثبت ۱۷۲۰۵</div>';
-    $xi_invoice_pdf_output .= '</div>';
-    $xi_invoice_pdf_output .= '<hr>';
-    $xi_invoice_pdf_output .= '<p>testtt</p>';
+    $html .= '<div class="xi-invoice-header">';
+    $html .= '<div class="logo"><img src="' . $logoURL . '" alt=""></div>';
+    $html .= '<div class="company-name">شرکت نیک عطرآگین پارس</div>';
+    $html .= '<div class="company-registration-number">شماره ثبت ۱۷۲۰۵</div>';
+    $html .= '</div>';
+    $html .= '<hr>';
+    $html .= esc_html($invoice->visitor_name);
     // Header End
-    $xi_invoice_pdf_output .= '<p class="xi-invoice-number"><b>' . esc_html($invoice->invoice_id) . '</b></p>';
-    $xi_invoice_pdf_output .= '<p><b>تاریخ ثبت:</b> ' . esc_html($datetime->format('Y/n/j')) . '</p>';
-    $xi_invoice_pdf_output .= '<p><b>نام ویزیتور:</b> ' . esc_html($invoice->visitor_name) . '</p>';
-    $xi_invoice_pdf_output .= '<p><b>نام مشتری:</b> ' . esc_html($invoice->customer_name) . '</p>';
-    $xi_invoice_pdf_output .= '<p><b>شماره مشتری:</b> ' . esc_html($invoice->customer_mobile_no) . '</p>';
-    $xi_invoice_pdf_output .= '<p><b>نام فروشگاه:</b> ' . esc_html($invoice->customer_shop_name) . '</p>';
-    $xi_invoice_pdf_output .= '<p><b>آدرس مشتری:</b> ' . esc_html($invoice->customer_address) . '</p>';
-    $xi_invoice_pdf_output .= '<p><b>نحوه پرداخت:</b> ' . esc_html($paymentMethod) . '</p>';
+    $html .= '<p class="xi-invoice-number">' . esc_html($invoice->invoice_id) . '</p>';
+    $html .= '<p>تاریخ ثبت: ' . esc_html($datetime->format('Y/n/j')) . '</p>';
+    $html .= '<p>نام ویزیتور: ' . esc_html($invoice->visitor_name) . '</p>';
+    $html .= '<p>نام مشتری: ' . esc_html($invoice->customer_name) . '</p>';
+    $html .= '<p>شماره مشتری: ' . esc_html($invoice->customer_mobile_no) . '</p>';
+    $html .= '<p>نام فروشگاه: ' . esc_html($invoice->customer_shop_name) . '</p>';
+    $html .= '<p>آدرس مشتری: ' . esc_html($invoice->customer_address) . '</p>';
+    $html .= '<p>نحوه پرداخت: ' . esc_html($paymentMethod) . '</p>';
 
-    $xi_invoice_pdf_output .= '<p class="xi-header"><b>اقلام فروخته شده:</b></p>';
-    $xi_invoice_pdf_output .= '<table class="xi-items-list"><tr><th>نام</th><th>تعداد</th><th>قیمت</th><th>جمع</th></tr>';
+    $html .= '<p class="xi-header">اقلام فروخته شده:</p>';
+    $html .= '<table class="xi-items-list"><tr><th>نام</th><th>تعداد</th><th>قیمت</th><th>جمع</th></tr>';
     foreach ($products as $product) {
-        $xi_invoice_pdf_output .= '<tr><td>' . esc_html($product->product_name) . '</td><td>' . esc_html($product->product_qty) . '</td><td>' . esc_html(number_format($product->product_net_price)) . '</td><td>' . esc_html(number_format($product->product_total_price)) . '</td></tr>';
+        $html .= '<tr><td>' . esc_html($product->product_name) . '</td><td>' . esc_html($product->product_qty) . '</td><td>' . esc_html(number_format($product->product_net_price)) . '</td><td>' . esc_html(number_format($product->product_total_price)) . '</td></tr>';
     }
-    $xi_invoice_pdf_output .= '</table>';
+    $html .= '</table>';
     if (!empty($returned_products)) {
-        $xi_invoice_pdf_output .= '<p class="xi-header"><b>اقلام مرجوعی:</b></p>';
-        $xi_invoice_pdf_output .= '<table class="xi-returned-items-list"><tr><th>نام</th><th>تعداد</th><th>قیمت</th><th>جمع</th></tr>';
+        $html .= '<p class="xi-header">اقلام مرجوعی:</p>';
+        $html .= '<table class="xi-returned-items-list"><tr><th>نام</th><th>تعداد</th><th>قیمت</th><th>جمع</th></tr>';
         foreach ($returned_products as $product) {
-            $xi_invoice_pdf_output .= '<tr><td>' . esc_html($product->product_name) . '</td><td>' . esc_html($product->product_qty) . '</td><td>' . esc_html(number_format($product->product_net_price)) . '</td><td>' . esc_html(number_format($product->product_total_price)) . '</td></tr>';
+            $html .= '<tr><td>' . esc_html($product->product_name) . '</td><td>' . esc_html($product->product_qty) . '</td><td>' . esc_html(number_format($product->product_net_price)) . '</td><td>' . esc_html(number_format($product->product_total_price)) . '</td></tr>';
         }
-        $xi_invoice_pdf_output .= '</table>';
+        $html .= '</table>';
     }
-    $xi_invoice_pdf_output .= '<table class="xi-pricing">';
-    $xi_invoice_pdf_output .= '<tr><td><b>جمع کل:</b></td><td class="xi-table-prices">' . esc_html(number_format($invoice->order_total_pure)) . ' ریال</td></tr>';
+    $html .= '<table class="xi-pricing">';
+    $html .= '<tr><td>جمع کل:</td><td class="xi-table-prices">' . esc_html(number_format($invoice->order_total_pure)) . ' ریال</td></tr>';
     if ($invoice->order_include_tax === 'yes') {
-        $xi_invoice_pdf_output .= '<tr><td><b>مقدار مالیات:</b></td><td class="xi-table-prices"> %' . esc_html(number_format($invoice->order_total_tax)) . '</td></tr>';
+        $html .= '<tr><td>مقدار مالیات:</td><td class="xi-table-prices"> %' . esc_html(number_format($invoice->order_total_tax)) . '</td></tr>';
     }
     if ($invoice->order_include_discount === 'yes') {
         if ($invoice->discount_method === 'percent') {
-            $xi_invoice_pdf_output .= '<tr><td><b>مقدار تخفیف:</b></td><td class="xi-table-prices"> %' . esc_html(number_format($invoice->discount_total_percentage)) . ' معادل ' . esc_html(number_format($invoice->discount_total_amount)) . ' ریال</td></tr>';
+            $html .= '<tr><td>مقدار تخفیف:</td><td class="xi-table-prices"> %' . esc_html(number_format($invoice->discount_total_percentage)) . ' معادل ' . esc_html(number_format($invoice->discount_total_amount)) . ' ریال</td></tr>';
         } elseif ($invoice->discount_method === 'constant') {
-            $xi_invoice_pdf_output .= '<tr><td><b>مقدار تخفیف:</b></td><td class="xi-table-prices"> ' . esc_html(number_format($invoice->discount_total_amount)) . ' ریال</td></tr>';
+            $html .= '<tr><td>مقدار تخفیف:</td><td class="xi-table-prices"> ' . esc_html(number_format($invoice->discount_total_amount)) . ' ریال</td></tr>';
         }
     }
-    $xi_invoice_pdf_output .= '<tr><td><b>مبلغ نهایی:</b></td><td class="xi-table-prices">' . esc_html(number_format($invoice->order_total_final)) . ' ریال</td></tr>';
-    $xi_invoice_pdf_output .= '</table>';
+    $html .= '<tr><td>مبلغ نهایی:</td><td class="xi-table-prices">' . esc_html(number_format($invoice->order_total_final)) . ' ریال</td></tr>';
+    $html .= '</table>';
     // Footer End
-    $xi_invoice_pdf_output .= '<div class="xi-invoice-footer">';
-    $xi_invoice_pdf_output .= '<div class="thanks-message"><b>تشکر از خرید شما، به امید دیدار مجدد.</b></div>';
-    $xi_invoice_pdf_output .= '<table class="xi-footer-table"><tbody>';
-    $xi_invoice_pdf_output .= '<tr><td>مدیر فروش (استادی)</td><td>۰۹۳۰۴۹۴۶۶۹۴</td></tr>';
-    $xi_invoice_pdf_output .= '<tr><td>مدیر تولید (قنبری)</td><td>۰۹۱۹۸۵۲۱۸۵۶</td></tr>';
-    $xi_invoice_pdf_output .= '<tr class="links"><td class="site">www.NikPerfume.com</td><td class="instagram">Instagram: NiikPerfume</td></tr>';
-    $xi_invoice_pdf_output .= '</tbody></table>';
-    $xi_invoice_pdf_output .= '</div>';
+    $html .= '<div class="xi-invoice-footer">';
+    $html .= '<div class="thanks-message">تشکر از خرید شما، به امید دیدار مجدد.</div>';
+    $html .= '<table class="xi-footer-table"><tbody>';
+    $html .= '<tr><td>مدیر فروش (استادی)</td><td>۰۹۳۰۴۹۴۶۶۹۴</td></tr>';
+    $html .= '<tr><td>مدیر تولید (قنبری)</td><td>۰۹۱۹۸۵۲۱۸۵۶</td></tr>';
+    $html .= '<tr class="links"><td class="site">www.NikPerfume.com</td><td class="instagram">Instagram: NiikPerfume</td></tr>';
+    $html .= '</tbody></table>';
+    $html .= '</div>';
     // Footer End
-    $xi_invoice_pdf_output .= '</div>';
-    // $xi_invoice_pdf_output .= ob_get_clean();
+    $html .= '</div>';
+    $html .= '</body>
+                </html>';
 
-    $dompdf->loadHtml($xi_invoice_pdf_output);
-    $dompdf->setPaper('A4', 'portrait');
-    $dompdf->render();
+
 
     // Define the PDF file path
     $upload_dir = wp_upload_dir();
@@ -397,7 +441,11 @@ function generate_invoice_pdf()
         $counter++;
     } while (file_exists($pdf_file_path));
 
-    file_put_contents($pdf_file_path, $dompdf->output());
+
+    $pdf->WriteHTMLCell(0, 0, '', '', $html, 0, 1, 0, true, '', true);
+    // Close and output PDF document
+    $pdf->Output($pdf_file_path, 'F'); // Output the PDF to the browser (I: Inline, D: Download)
+
 
     $pdf_url = trailingslashit($upload_dir['baseurl']) . 'invoices/' . $pdf_filename;
     wp_send_json_success(array('message' => 'PDF generated successfully', 'pdf_url' => $pdf_url));
