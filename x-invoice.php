@@ -2,10 +2,10 @@
 /*
 Plugin Name: X-Invoice
 Description: This is a Invoice WordPress plugin.
-Version: 1.1.6
+Version: 1.1.7
 Author: Nima Amani <metananima@gmail.com>
 */
-define('X_INVOICE_VERSION', '1.1.6');
+define('X_INVOICE_VERSION', '1.1.9');
 define('X_INVOICE_PLUGIN_URL', plugin_dir_url(__FILE__));
 require_once plugin_dir_path(__FILE__) . 'includes/database/db-functions.php';
 
@@ -34,6 +34,7 @@ require_once plugin_dir_path(__FILE__) . 'includes/admin/invoices.php';
 require_once plugin_dir_path(__FILE__) . 'includes/admin/invoices-all.php';
 require_once plugin_dir_path(__FILE__) . 'includes/admin/invoices-single.php';
 require_once plugin_dir_path(__FILE__) . 'includes/admin/invoices-edit.php';
+require_once plugin_dir_path(__FILE__) . 'vendor/autoload.php';
 
 
 require_once plugin_dir_path(__FILE__) . 'includes/admin/orders_list.php';
@@ -113,15 +114,6 @@ function x_invoice_plugin_admin_menu()
         'xi-edit-customer-data',
         'edit_customer_data_page'
     );
-    // $xi_edit_customer_data = add_submenu_page(
-    //     'x-invoice',
-    //     'all invoices',
-    //     'all invoices',
-    //     'manage_options',
-    //     'xi-invoices',
-    //     'invoice_actions'
-    // );
-
 }
 add_action('admin_menu', 'x_invoice_plugin_admin_menu');
 
@@ -134,11 +126,26 @@ function x_invoice_enqueue_admin_styles($hook_suffix)
 add_action('admin_enqueue_scripts', 'x_invoice_enqueue_admin_styles');
 
 
+function x_invoice_shortcuts()
+{
+    $siteUrl            = get_site_url();
+    $adminUrl           = admin_url();
+    $regPageSlug        = get_option('regPageSlug');
+    $regPageUrl         = $siteUrl . '/' . $regPageSlug;
+    $reportsPageUrl     = $adminUrl . 'admin.php?page=xi-invoices';
+?>
+    <div class="xi_shortcuts">
+        <a class="xi_btn xi_invoice_shortcuts button-secondary" href="<?php echo $regPageUrl; ?>" target="_blank">ثبت فاکتور جدید</a>
+        <a class="xi_btn xi_invoice_shortcuts button-secondary" href="<?php echo $reportsPageUrl; ?>" target="_blank">گزارش فروش من</a>
+    </div>
+<?php
+}
 
 function invoice_main_function()
 {
     echo '<div class="wrap">';
     echo '<h1>به افزونه ایکس فاکتور خوش آمدید | نسخه  ' . X_INVOICE_VERSION . '</h1>';
+    x_invoice_shortcuts();
     settings();
     echo '</div>';
 }
@@ -147,6 +154,7 @@ function invoice_actions()
 {
     echo '<div class="wrap">';
     echo '<h1>به افزونه ایکس فاکتور خوش آمدید</h1>';
+    x_invoice_shortcuts();
     x_invoices_page();
     echo '</div>';
 }
@@ -155,6 +163,7 @@ function invoice_orders_list()
 {
     echo '<div class="wrap">';
     echo '<h1>به افزونه ایکس فاکتور خوش آمدید</h1>';
+    x_invoice_shortcuts();
     x_invoice_orders_page();
     echo '</div>';
 }
@@ -164,6 +173,7 @@ function x_reports()
 {
     echo '<div class="wrap">';
     echo '<h1>گزارش ها:</h1>';
+    x_invoice_shortcuts();
     x_reports_page();
     echo '</div>';
 }
@@ -172,6 +182,7 @@ function products_data_page()
 {
     echo '<div class="wrap">';
     echo '<h1>افزودن یا ویرایش اطلاعات محصولات</h1>';
+    x_invoice_shortcuts();
     showMessage();
     x_invoice_edit_products_page();
     echo '</div>';
@@ -180,6 +191,7 @@ function add_customer_data_page()
 {
     echo '<div class="wrap">';
     echo '<h1>افزودن اطلاعات</h1>';
+    x_invoice_shortcuts();
     showMessage();
     if (isset($_POST['some_other_action'])) {
         x_invoice_add_customers_page();
@@ -191,6 +203,7 @@ function edit_customer_data_page()
 {
     echo '<div class="wrap">';
     echo '<h1>ویرایش اطلاعات</h1>';
+    x_invoice_shortcuts();
     showMessage();
     if (isset($_POST['some_other_action'])) {
         x_invoice_edit_customers_page();
@@ -262,6 +275,7 @@ function generate_invoice_pdf()
         return;
     }
 
+
     // Fetch the invoice details
     $invoices = new Xi_Invoices_Invoice();
     $invoiceLogoOption  = get_option('invoiceLogo', '');
@@ -284,6 +298,14 @@ function generate_invoice_pdf()
     // Assuming you've properly included the DOMPDF library
     require_once plugin_dir_path(__FILE__) . 'vendor/autoload.php';
     $dompdf = new Dompdf\Dompdf();
+    // Set up the font
+    $fontDir = plugin_dir_path(__FILE__) . 'fonts'; // Path to the fonts directory
+    $fontFile = $fontDir . '/IranSansFaNum.ttf'; // Path to the IranSansFaNum font file
+    // Register the font with DOMPDF
+    $dompdf->getOptions()->setChroot(realpath($fontDir));
+    $dompdf->getOptions()->setFontDir($fontDir);
+    $dompdf->getOptions()->setFontCache($fontDir);
+    $dompdf->getFontMetrics()->registerFont('IranSansFaNum', 'normal', $fontFile);
 
     // Construct the HTML for the invoice
     // ob_start();

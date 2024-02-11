@@ -57,6 +57,7 @@ function x_invoice_shortcode()
 
     ob_start();
 ?>
+    <?php x_invoice_shortcuts(); ?>
     <form method="post" action="" id="x-invoice-customers-form">
         <div class="xi_add_new_records">
             <a class="xi_btn new_customer" id="new_customer" href="#">افزودن مشتری جدید</a>
