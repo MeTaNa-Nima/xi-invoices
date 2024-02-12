@@ -422,6 +422,7 @@ function fetchCustomerDetails(customerId) {
 			},
 			success: function(response) {
 				if(response.success) {
+					$("div.xi-invoice-view div.xi-invoice-view-form-controls input.xi-pdf-url").val(response.data.pdf_url);
 					alert('PDF saved successfully.');
 					// Optionally direct the user to the PDF
 					window.location.href = response.data.pdf_url;
