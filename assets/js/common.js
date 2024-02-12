@@ -372,6 +372,8 @@ jQuery(document).ready(function ($) {
             success: function(response) {
                 if (response.success) {
                     alert('PDF saved: ' + response.data.pdf_url);
+					$("div.xi-invoice-view div.xi-invoice-view-form-controls input.xi-pdf-url").val(response.data.pdf_url);
+
                 } else {
                     alert('Failed to generate PDF.');
                 }
@@ -410,26 +412,4 @@ function fetchCustomerDetails(customerId) {
 		},
 	});
 
-	$('.xi-invoice-save-pdf').on('click', function(e) {
-		e.preventDefault();
-		var invoiceId = $(this).data('invoice-id'); // Adjusted to use data attribute
-		$.ajax({
-			url: ajaxurl,
-			type: 'POST',
-			data: {
-				action: 'generate_invoice_pdf',
-				invoice_id: invoiceId
-			},
-			success: function(response) {
-				if(response.success) {
-					$("div.xi-invoice-view div.xi-invoice-view-form-controls input.xi-pdf-url").val(response.data.pdf_url);
-					alert('PDF saved successfully.');
-					// Optionally direct the user to the PDF
-					window.location.href = response.data.pdf_url;
-				} else {
-					alert('There was a problem generating the PDF.');
-				}
-			}
-		});
-	});
 }
