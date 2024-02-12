@@ -2,13 +2,12 @@
 /*
 Plugin Name: X-Invoice
 Description: This is a Invoice WordPress plugin.
-Version: 1.2.0
+Version: 1.2.2
 Author: Nima Amani <metananima@gmail.com>
 */
-define('X_INVOICE_VERSION', '1.2.0');
+define('X_INVOICE_VERSION', '1.2.2');
 define('X_INVOICE_PLUGIN_URL', plugin_dir_url(__FILE__));
 require_once plugin_dir_path(__FILE__) . 'includes/database/db-functions.php';
-
 
 
 // OOP STARTED:
@@ -18,17 +17,20 @@ require_once plugin_dir_path(__FILE__) . 'includes/classes/class-xi-invoices-inv
 require_once plugin_dir_path(__FILE__) . 'includes/classes/class-xi-invoices-reports.php';
 
 
-
 // Starting File reStructuring:
 require_once plugin_dir_path(__FILE__) . 'includes/jdf.php';
 require_once plugin_dir_path(__FILE__) . 'includes/helper-functions.php';
-require_once plugin_dir_path(__FILE__) . 'includes/admin/settings.php';
+
 require_once plugin_dir_path(__FILE__) . 'includes/public/shortcodes/x-invoice-shortcode.php';
 require_once plugin_dir_path(__FILE__) . 'includes/public/shortcodes/x-invoice-view-order-shortcode.php';
+
+
+require_once plugin_dir_path(__FILE__) . 'includes/admin/settings.php';
 require_once plugin_dir_path(__FILE__) . 'includes/admin/add-customers-data.php';
 require_once plugin_dir_path(__FILE__) . 'includes/admin/edit-customers-data.php';
 require_once plugin_dir_path(__FILE__) . 'includes/admin/edit-products-data.php';
 require_once plugin_dir_path(__FILE__) . 'includes/admin/reports.php';
+require_once plugin_dir_path(__FILE__) . 'includes/admin/orders_list.php';
 
 require_once plugin_dir_path(__FILE__) . 'includes/admin/invoices.php';
 require_once plugin_dir_path(__FILE__) . 'includes/admin/invoices-all.php';
@@ -38,7 +40,7 @@ require_once plugin_dir_path(__FILE__) . 'includes/admin/invoices-edit.php';
 require_once plugin_dir_path(__FILE__) . 'vendor/autoload.php';
 
 
-require_once plugin_dir_path(__FILE__) . 'includes/admin/orders_list.php';
+
 
 
 
@@ -213,10 +215,6 @@ function edit_customer_data_page()
     echo '</div>';
 }
 
-
-
-
-
 function x_invoice_enqueue_scripts()
 {
     // Enqueue the common.js script
@@ -242,19 +240,6 @@ add_action('admin_enqueue_scripts', 'x_invoice_enqueue_scripts');
 
 
 
-function xi_hide_admin_bar_for_marketers($show_admin_bar)
-{
-    $user = wp_get_current_user();
-    if (in_array('marketer', $user->roles)) {
-        return false; // Hide admin bar
-    }
-    return $show_admin_bar; // Otherwise, show admin bar as usual
-}
-add_filter('show_admin_bar', 'xi_hide_admin_bar_for_marketers');
-
-
-
-
 // PDF Creation
 function generate_invoice_pdf()
 {
@@ -270,18 +255,19 @@ function generate_invoice_pdf()
     }
     require_once plugin_dir_path(__FILE__) . 'vendor/autoload.php';
 
-
-
-
     ////////////////// PDF TEST START //////////////////
 
-    $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+    $pdf = new TCPDF(PDF_PAGE_ORIENTATION, 'mm', array(80, 3000), true, 'UTF-8', false);
+    $pdf->setPrintHeader(false);
+    $pdf->setPrintFooter(false);
+    $pdf->SetMargins(5, 5, 5, true); // Adjust these values according to your needs
+    $pdf->SetAutoPageBreak(TRUE, 0);
 
-    // Specify the path to your TTF font
+
+
     $fontPath = plugin_dir_path(__FILE__) . 'assets/fonts/IranSansFaNum.ttf';
-
-    // Convert and add the font to TCPDF
     $fontname = TCPDF_FONTS::addTTFfont($fontPath, 'TrueTypeUnicode', '', 96);
+
 
     // Set document information
     $pdf->SetCreator(PDF_CREATOR);
@@ -292,24 +278,13 @@ function generate_invoice_pdf()
     // Set default monospaced font
     $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
 
-    // Set margins
-    $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
-    $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
-    $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
-
     // Set auto page breaks
     $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
 
-    // Set font
-    // $pdf->SetFont('freeserif', '', 12); // TCPDF supports "freeserif" for complex scripts like Persian
 
-    // Add a page
-    // $pdf->AddPage();
-
-
-    $pdf->SetFont($fontname, '', 12);
+    $pdf->SetFont($fontname, '', 8);
     $pdf->AddPage();
-    $pdf->Write(0, '', '', 0, 'L', true, 0, false, false, 0);
+    $pdf->setRTL(true);
 
     ////////////////// PDF TEST END //////////////////
 
@@ -337,25 +312,135 @@ function generate_invoice_pdf()
 
     // Prepare HTML content
     $html = '<!DOCTYPE html>
-     <html dir="rtl" lang="fa-IR">
-     <head>
-         <meta charset="UTF-8">
-         
-         <link rel="stylesheet" href="' . plugin_dir_url(__FILE__) . 'assets/css/public.css">
-         <style>
-             @font-face {
-                 font-family: "IranSansFaNum";
-                 src: url("' . plugin_dir_url(__FILE__) . 'assets/fonts/IranSansFaNum.ttf") format("truetype");
-             }
-             body, p, div, span, table, thead, tbody, tfoot, tr, th, td {
-                 font-family: "IranSansFaNum", sans-serif !important;
-                 direction: rtl !important;
-                 text-align: right !important;
-
-             }
-         </style>
-     </head>
-     <body>';
+                <html dir="rtl" lang="fa-IR">
+                <head>
+                    <meta charset="UTF-8">
+                    <style>
+                        @font-face {
+                            font-family: "IranSansFaNum";
+                            src: url("' . plugin_dir_url(__FILE__) . 'assets/fonts/IranSansFaNum.ttf") format("truetype");
+                        }
+                        body, p, div, span, table, thead, tbody, tfoot, tr, th, td {
+                            font-family: "IranSansFaNum", sans-serif;
+                            direction: rtl;
+                            text-align: right;
+                        }
+                        .xi-invoice-view {
+                            width: 100% !important;
+                            padding: 0 !important;
+                            margin: 0 !important;
+                            font-size: 0.7em;
+                            display: flex;
+                            flex-direction: column-reverse;
+                            align-items: center;
+                        }
+                        .xi-invoice-view .xi-invoice-view-form-controls .go-back-btn a,
+                        .xi-invoice-view .xi-invoice-view-form-controls .xi-print-invoice a
+                         {
+                            border: 1px solid;
+                            padding: 1em;
+                            text-decoration: none;
+                            background: #4848ff;
+                            color: #fff;
+                            cursor: pointer;
+                        }
+                        .xi-invoice-view .xi-invoice-view-form-controls .go-back-btn,
+                        .xi-invoice-view .xi-invoice-view-form-controls .xi-print-invoice {
+                            display: flex;
+                            flex-direction: row;
+                            justify-content: space-between;
+                        }
+                        .xi-invoice-view .xi-invoice-view-form-controls {
+                            display: flex;
+                            gap: 1em;
+                            flex-direction: column;
+                        }
+                        .xi-invoice-view table.xi-items-list,
+                        .xi-invoice-view table.xi-returned-items-list {
+                            width: 100%;
+                            margin: 0 0 2em 0;
+                        }
+                        .xi-invoice-view table.xi-items-list,
+                        .xi-invoice-view table.xi-items-list th,
+                        .xi-invoice-view table.xi-items-list td,
+                        .xi-invoice-view table.xi-returned-items-list,
+                        .xi-invoice-view table.xi-returned-items-list th,
+                        .xi-invoice-view table.xi-returned-items-list td {
+                            border: 1px dashed gray;
+                            border-collapse: collapse;
+                            text-align: center;
+                        }
+                        .xi-invoice-view p {
+                            margin: 0.3em 0;
+                        }
+                        .xi-invoice-view hr {
+                            border-style: dashed;
+                            max-width: 100%;
+                            width: 100%;
+                        }
+                        .xi-invoice-view .xi-invoice-result .xi-final-total {
+                            border: 5px solid black;
+                            padding: 5px;
+                        }
+                        .xi-invoice-header .company-name, .xi-invoice-header .company-registration-number {
+                            font-weight: 700;
+                        }
+                        .xi-invoice-view .xi-invoice-footer {
+                            font-size: 11px;
+                        }
+                        .xi-invoice-view .xi-invoice-footer table, .xi-invoice-view .xi-pricing {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-bottom: 1em;
+                        }
+                        .xi-invoice-view .xi-invoice-view-form-controls .go-back-btn,
+                        .xi-invoice-view .xi-invoice-view-form-controls .xi-print-invoice,
+                        .xi-invoice-view .xi-current-date,
+                        .xi-invoice-view .xi-invoice-header,
+                        .xi-invoice-view .xi-invoice-footer,
+                        .xi-invoice-view table.xi-footer-table,
+                        .xi-invoice-view table.xi-footer-table th,
+                        .xi-invoice-view table.xi-footer-table td {
+                            text-align: center;
+                        }
+                        .xi-invoice-view tr.links td.site {
+                            border-left: 1px dashed;
+                        }
+                        .xi-invoice-view .xi-pricing td.xi-table-prices {
+                            text-align: left;
+                        }
+                        .xi-invoice-view .xi-items-list td,
+                        .xi-invoice-view .xi-items-list th,
+                        .xi-invoice-view .xi-returned-items-list td,
+                        .xi-invoice-view .xi-returned-items-list th,
+                        .xi-invoice-view .xi-invoice-footer td {
+                            padding: 0.5em 0;
+                        }
+                        .xi-invoice-view .xi-pricing td {
+                            padding: 1em 0;
+                        }
+                        .xi-invoice-view .xi-pricing tr {
+                            border-bottom: 1px dashed;
+                            border-top: 1px dashed;
+                        }
+                        .xi-invoice-view .logo {
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            flex-wrap: nowrap;
+                        }
+                        .xi-invoice-view .xi-invoice-header .logo img {
+                            max-width: 100px;
+                        }
+                        .xi-invoice-view .xi-invoice-header .logo {
+                            margin: 1em 0;
+                        }
+                        .xi-invoice-view .xi-invoice-number {
+                            text-align: left;
+                        }
+                    </style>
+                </head>
+                <body>';
     // Include a separate PHP file here if you prefer to keep the HTML structure apart
     if ($invoice->payment_method === 'cash') {
         $paymentMethod = 'نقد';
@@ -420,10 +505,7 @@ function generate_invoice_pdf()
     $html .= '</div>';
     // Footer End
     $html .= '</div>';
-    $html .= '</body>
-                </html>';
-
-
+    $html .= '</body></html>';
 
     // Define the PDF file path
     $upload_dir = wp_upload_dir();
@@ -441,13 +523,12 @@ function generate_invoice_pdf()
         $counter++;
     } while (file_exists($pdf_file_path));
 
-
     $pdf->WriteHTMLCell(0, 0, '', '', $html, 0, 1, 0, true, '', true);
     // Close and output PDF document
     $pdf->Output($pdf_file_path, 'F'); // Output the PDF to the browser (I: Inline, D: Download)
 
-
     $pdf_url = trailingslashit($upload_dir['baseurl']) . 'invoices/' . $pdf_filename;
+    $invoices->update_invoice_pdf_url($invoice_id, $pdf_url);
     wp_send_json_success(array('message' => 'PDF generated successfully', 'pdf_url' => $pdf_url));
 }
 add_action('wp_ajax_generate_invoice_pdf', 'generate_invoice_pdf');

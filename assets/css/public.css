@@ -11,8 +11,9 @@
     font-style: normal;
 }
 
-body, input, select, h1, h2, h3, h4, h5, h6, p {
+body, input, select, h1, h2, h3, h4, h5, h6, p, table, th, td, tr {
     font-family: 'IRANSansFaNum', sans-serif !important;
+	direction: rtl !important;
 }
 
 .x-invoice-form-inputs .x_invoice_top_td input,

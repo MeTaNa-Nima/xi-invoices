@@ -64,6 +64,7 @@ function xi_invoice_show_all()
             <th>مبلغ نهایی</th>
             <th>مشتری</th>
             <th>تاریخ</th>
+            <th>لینک PDF</th>
             <th>جزییات</th>
         </tr>
         <?php
@@ -83,6 +84,7 @@ function xi_invoice_show_all()
                     <td><?php echo esc_html(number_format($invoice->order_total_final)); ?></td>
                     <td><?php echo esc_html($customerName); ?></td>
                     <td><?php echo esc_html($datetime->format('Y/n/j')); ?></td>
+                    <td><?php echo !empty($invoice->invoice_pdf_link) ? '<a href="' . esc_attr($invoice->invoice_pdf_link) . '">دانلود PDF</a>' : ''; ?></td>
                     <td>
                         <?php
                         if (in_array('administrator', wp_get_current_user()->roles)) {

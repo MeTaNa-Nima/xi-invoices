@@ -55,6 +55,7 @@ function x_invoice_create_or_update_tables()
         order_total_final decimal(60,0) NOT NULL,
         visitor_id mediumint(9) NOT NULL,
         include_returned_products varchar(50) NOT NULL,
+        invoice_pdf_link text NOT NULL,
         invoice_notes text NOT NULL,
         PRIMARY KEY  (invoice_id),
         FOREIGN KEY (customer_id) REFERENCES $customers_table(customer_id)

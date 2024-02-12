@@ -41,3 +41,14 @@ function x_invoice_hide_admin_footer()
     }
 }
 add_action('admin_footer', 'x_invoice_hide_admin_footer');
+
+
+function xi_hide_admin_bar_for_marketers($show_admin_bar)
+{
+    $user = wp_get_current_user();
+    if (in_array('marketer', $user->roles)) {
+        return false; // Hide admin bar
+    }
+    return $show_admin_bar; // Otherwise, show admin bar as usual
+}
+add_filter('show_admin_bar', 'xi_hide_admin_bar_for_marketers');

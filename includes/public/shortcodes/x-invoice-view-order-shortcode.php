@@ -155,8 +155,9 @@ function x_invoice_view_order_shortcode()
         </div>
         <div class="xi-print-invoice">
             <a class="xi-invoice-print" onClick="window.print()">چاپ فاکتور</a>
-            <a href="#" class="xi-invoice-save-pdf" data-invoice-id="' .$invoice_number . '">ذخیره pdf در سایت</a>
+            <a href="#" class="xi-invoice-save-pdf" data-invoice-id="' . $invoice_number . '">ذخیره pdf در سایت</a>
         </div>
+        <input class="xi-pdf-url" readonly type="text" value="' . $invoice->invoice_pdf_link . '" placeholder="برای دریافت لینک، ابتدا pdf را تولید کنید.">
     </div>';
     $xi_invoice_view_output .= ob_get_clean();
 

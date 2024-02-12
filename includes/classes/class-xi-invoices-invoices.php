@@ -42,6 +42,14 @@ class Xi_Invoices_Invoice {
         );
     }
 
+    public function update_invoice_pdf_url($invoice_id, $pdfUrl) {
+        return $this->wpdb->update(
+            $this->operation_data_table,
+            array('invoice_pdf_link'    => $pdfUrl),
+            array('invoice_id'          => $invoice_id)
+        );
+    }
+
     // Getting Data
     public function get_invoice($invoice_id) {
         $invoice = $this->wpdb->get_row($this->wpdb->prepare("SELECT * FROM $this->operation_data_table WHERE invoice_id = %d", $invoice_id));
