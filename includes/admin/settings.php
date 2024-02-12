@@ -25,6 +25,7 @@ function settings()
         update_option('taxAmount',          sanitize_text_field($_POST['applied_tax']));
         update_option('dateFormat',         sanitize_text_field($_POST['date_format']));
         update_option('regPageSlug',        sanitize_text_field($_POST['invoice_registration_page_slug']));
+        update_option('viewPageSlug',       sanitize_text_field($_POST['invoice_view_page_slug']));
 
         // Handle the logo settings
         if (isset($_POST['invoice_logo'])) {
@@ -59,6 +60,7 @@ function settings()
     $dateFormat     = get_option('dateFormat', 'date_format');
     $invoiceLogo    = get_option('invoiceLogo', 'default_site_logo');
     $regPageSlug    = get_option('regPageSlug', 'invoice_registration_page_slug');
+    $viewPageSlug   = get_option('viewPageSlug', 'invoice_view_page_slug');
 
 ?>
     <form action="" method="post" enctype="multipart/form-data">
@@ -101,8 +103,8 @@ function settings()
                 <td><input type="text" name="invoice_registration_page_slug" value="<?php echo $regPageSlug; ?>"></td>
             </tr>
             <tr>
-                <th><label for="options5">تنظیمات پنجم</label></th>
-                <td><input disabled type="text" name="options5" value=""></td>
+                <th><label for="invoice_view_page_slug">لینک برگه نمایش آخرین فاکتور</label></th>
+                <td><input type="text" name="invoice_view_page_slug" value="<?php echo $viewPageSlug; ?>"></td>
             </tr>
             <tr>
                 <th><label for="options6">تنظیمات ششم</label></th>

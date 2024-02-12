@@ -134,11 +134,14 @@ function x_invoice_shortcuts()
     $siteUrl            = get_site_url();
     $adminUrl           = admin_url();
     $regPageSlug        = get_option('regPageSlug');
+    $viewPageSlug       = get_option('viewPageSlug');
     $regPageUrl         = $siteUrl . '/' . $regPageSlug;
+    $viewPageUrl        = $siteUrl . '/' . $viewPageSlug;
     $reportsPageUrl     = $adminUrl . 'admin.php?page=xi-invoices';
 ?>
     <div class="xi_shortcuts">
         <a class="xi_btn xi_invoice_shortcuts button-secondary" href="<?php echo $regPageUrl; ?>" target="_blank">ثبت فاکتور جدید</a>
+        <a class="xi_btn xi_invoice_shortcuts button-secondary" href="<?php echo $viewPageUrl; ?>" target="_blank">مشاهده آخرین فاکتور</a>
         <a class="xi_btn xi_invoice_shortcuts button-secondary" href="<?php echo $reportsPageUrl; ?>" target="_blank">گزارش فروش من</a>
     </div>
 <?php
