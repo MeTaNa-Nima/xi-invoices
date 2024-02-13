@@ -1,3 +1,6 @@
 - Reports Page Back-End Editable (!?)
 - limit functions for admins only (manage optins?)
 
+- pdf height 
+- pdf styles
+- 

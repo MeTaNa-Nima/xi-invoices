@@ -2,10 +2,10 @@
 /*
 Plugin Name: X-Invoice
 Description: This is a Invoice WordPress plugin.
-Version: 1.2.2
+Version: 1.2.3
 Author: Nima Amani <metananima@gmail.com>
 */
-define('X_INVOICE_VERSION', '1.2.2');
+define('X_INVOICE_VERSION', '1.2.3');
 define('X_INVOICE_PLUGIN_URL', plugin_dir_url(__FILE__));
 require_once plugin_dir_path(__FILE__) . 'includes/database/db-functions.php';
 
@@ -138,11 +138,14 @@ function x_invoice_shortcuts()
     $regPageUrl         = $siteUrl . '/' . $regPageSlug;
     $viewPageUrl        = $siteUrl . '/' . $viewPageSlug;
     $reportsPageUrl     = $adminUrl . 'admin.php?page=xi-invoices';
+    $addCustomerUrl     = $adminUrl . 'admin.php?page=xi-add-customer-data';
 ?>
-    <div class="xi_shortcuts">
-        <a class="xi_btn xi_invoice_shortcuts button-secondary" href="<?php echo $regPageUrl; ?>" target="_blank">ثبت فاکتور جدید</a>
-        <a class="xi_btn xi_invoice_shortcuts button-secondary" href="<?php echo $viewPageUrl; ?>" target="_blank">مشاهده آخرین فاکتور</a>
-        <a class="xi_btn xi_invoice_shortcuts button-secondary" href="<?php echo $reportsPageUrl; ?>" target="_blank">گزارش فروش من</a>
+    <div class="xi_shortcuts xi_btn_group">
+        <a class="xi_btn xi_invoice_shortcuts button-secondary" href="<?php echo $regPageUrl; ?>" target="_blank">فاکتور جدید</a>
+        <a class="xi_btn xi_invoice_shortcuts button-secondary" href="<?php echo $addCustomerUrl; ?>" target="_blank">افزودن مشتری</a>
+        <a class="xi_btn xi_invoice_shortcuts button-secondary" href="<?php echo $viewPageUrl; ?>" target="_blank">آخرین فاکتور</a>
+        <a class="xi_btn xi_invoice_shortcuts button-secondary" href="<?php echo $reportsPageUrl; ?>" target="_blank">گزارش فروش</a>
+        <a class="xi_btn xi_invoice_shortcuts button-secondary" href="<?php echo wp_logout_url(); ?>" target="_blank">خروج از حساب</a>
     </div>
 <?php
 }
@@ -260,7 +263,7 @@ function generate_invoice_pdf()
 
     ////////////////// PDF TEST START //////////////////
 
-    $pdf = new TCPDF(PDF_PAGE_ORIENTATION, 'mm', array(80, 3000), true, 'UTF-8', false);
+    $pdf = new TCPDF(PDF_PAGE_ORIENTATION, 'mm', array(80, 300), true, 'UTF-8', false);
     $pdf->setPrintHeader(false);
     $pdf->setPrintFooter(false);
     $pdf->SetMargins(5, 5, 5, true); // Adjust these values according to your needs
@@ -327,6 +330,7 @@ function generate_invoice_pdf()
                             font-family: "IranSansFaNum", sans-serif;
                             direction: rtl;
                             text-align: right;
+                            font-size: 8px !important;
                         }
                         .xi-invoice-view {
                             width: 100% !important;
@@ -336,22 +340,6 @@ function generate_invoice_pdf()
                             display: flex;
                             flex-direction: column-reverse;
                             align-items: center;
-                        }
-                        .xi-invoice-view .xi-invoice-view-form-controls .go-back-btn a,
-                        .xi-invoice-view .xi-invoice-view-form-controls .xi-print-invoice a
-                         {
-                            border: 1px solid;
-                            padding: 1em;
-                            text-decoration: none;
-                            background: #4848ff;
-                            color: #fff;
-                            cursor: pointer;
-                        }
-                        .xi-invoice-view .xi-invoice-view-form-controls .go-back-btn,
-                        .xi-invoice-view .xi-invoice-view-form-controls .xi-print-invoice {
-                            display: flex;
-                            flex-direction: row;
-                            justify-content: space-between;
                         }
                         .xi-invoice-view .xi-invoice-view-form-controls {
                             display: flex;
@@ -377,7 +365,7 @@ function generate_invoice_pdf()
                             margin: 0.3em 0;
                         }
                         .xi-invoice-view hr {
-                            border-style: dashed;
+                            border: 1px dashed;
                             max-width: 100%;
                             width: 100%;
                         }
@@ -385,17 +373,20 @@ function generate_invoice_pdf()
                             border: 5px solid black;
                             padding: 5px;
                         }
-                        .xi-invoice-header .company-name, .xi-invoice-header .company-registration-number {
+                        .xi-invoice-header .company-name,
+                        .xi-invoice-header .company-registration-number {
                             font-weight: 700;
                         }
                         .xi-invoice-view .xi-invoice-footer {
                             font-size: 11px;
                         }
-                        .xi-invoice-view .xi-invoice-footer table, .xi-invoice-view .xi-pricing {
+                        .xi-invoice-view .xi-invoice-footer table,
+                        .xi-invoice-view .xi-pricing {
                             width: 100%;
                             border-collapse: collapse;
                             margin-bottom: 1em;
                         }
+                        .xi_btn,
                         .xi-invoice-view .xi-invoice-view-form-controls .go-back-btn,
                         .xi-invoice-view .xi-invoice-view-form-controls .xi-print-invoice,
                         .xi-invoice-view .xi-current-date,
@@ -450,6 +441,7 @@ function generate_invoice_pdf()
     } elseif ($invoice->payment_method === 'cheque') {
         $paymentMethod = 'چک';
     }
+    $html .= '<div class="xi-invoice-view">';
     $html .= '<div class="xi-invoice-result">';
     // Header Start
     $html .= '<div class="xi-invoice-header">';
@@ -508,6 +500,7 @@ function generate_invoice_pdf()
     $html .= '</div>';
     // Footer End
     $html .= '</div>';
+    $html .= '</div>';
     $html .= '</body></html>';
 
     // Define the PDF file path
@@ -516,7 +509,6 @@ function generate_invoice_pdf()
     if (!file_exists($pdf_dir_path)) {
         wp_mkdir_p($pdf_dir_path);
     }
-
     // Generate the unique filename for the PDF
     $filename_base = tr_num(jdate('Ymd')) . $invoice_id;
     $counter = 1;
@@ -528,7 +520,7 @@ function generate_invoice_pdf()
 
     $pdf->WriteHTMLCell(0, 0, '', '', $html, 0, 1, 0, true, '', true);
     // Close and output PDF document
-    $pdf->Output($pdf_file_path, 'F'); // Output the PDF to the browser (I: Inline, D: Download)
+    $pdf->Output($pdf_file_path, 'F');
 
     $pdf_url = trailingslashit($upload_dir['baseurl']) . 'invoices/' . $pdf_filename;
     $invoices->update_invoice_pdf_url($invoice_id, $pdf_url);

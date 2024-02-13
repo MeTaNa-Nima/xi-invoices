@@ -381,6 +381,11 @@ jQuery(document).ready(function ($) {
         });
     });
     // PDF Creation End
+
+	$("div.xi-invoice-view div.xi-invoice-view-form-controls input.xi-pdf-url").on('click', function() {
+		$(this).select();
+		document.execCommand("copy");
+	});
 });
 
 

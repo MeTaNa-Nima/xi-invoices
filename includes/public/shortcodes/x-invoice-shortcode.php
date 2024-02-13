@@ -32,47 +32,11 @@ function x_invoice_shortcode()
         $current_date_time = date('Y/n/j H:i:s');
     }
 
-    if (isset($_POST['add_row'])) {
-        $customer_mobile_no = sanitize_text_field($_POST['new_customer_mobile_no']);
-
-        // Check if customer with the same national ID already exists
-        $mobile_no = sanitize_text_field($_POST['new_customer_mobile_no']);
-        $existing_customer = $customers->get_customer_by_mobile_no($mobile_no);
-
-        if ($existing_customer > 0) {
-            setMessage('قبل مشتری با این شماره موبایل ثبت شده است.');
-        } else {
-            // Insert new customer data
-            $new_data = array(
-                'customer_name'         => sanitize_text_field($_POST['new_customer_name']),
-                'customer_mobile_no'    => $customer_mobile_no,
-                'customer_address'      => sanitize_text_field($_POST['new_customer_address']),
-                'customer_shop_name'    => sanitize_text_field($_POST['new_customer_shop_name']),
-            );
-            $customers->add_customer($new_data);
-            echo '<script type="text/javascript">location.href = "' . $regPageSlug . '";</script>';
-        }
-    }
     $customers_data     = $customers->get_all_customers();
 
     ob_start();
 ?>
     <?php x_invoice_shortcuts(); ?>
-    <form method="post" action="" id="x-invoice-customers-form">
-        <div class="xi_add_new_records">
-            <a class="xi_btn new_customer" id="new_customer" href="#">افزودن مشتری جدید</a>
-        </div>
-        <?php showMessage(); ?>
-        <div class="xi_add_customer_container" id="x-invoice-customers-table" style="display: none;">
-            <input type="text" class="customer_name" name="new_customer_name" value="" placeholder="نام مشتری" />
-            <input type="text" class="customer_mobile_no" name="new_customer_mobile_no" value="" placeholder="شماره موبایل" />
-            <input type="text" class="customer_shop_name" name="new_customer_shop_name" value="" placeholder="نام فروشگاه" />
-            <input type="text" class="customer_address" name="new_customer_address" value="" placeholder="آدرس مشتری" />
-            <input type="submit" name="add_row" value="افزودن" class="button-primary" />
-        </div>
-        <hr>
-    </form>
-
     <form id="x-invoice" class="x-invoice" action="" method="post">
         <h3 class="xi-current-date">تاریخ امروز: <?php echo $today; ?></h3>
         <h2 class="x-invoice-title"></h2>
@@ -121,9 +85,7 @@ function x_invoice_shortcode()
                     <th>تعداد</th>
                     <th>قیمت واحد</th>
                     <th>جمع</th>
-                    <th>افزودن/حذف
-                        <br>ردیف
-                    </th>
+                    <th></th>
                     <tr>
                         <td class="x_invoice_table_td products_col">
                             <select name="custom_product_name" class="custom_product_name" id="custom_product_name">

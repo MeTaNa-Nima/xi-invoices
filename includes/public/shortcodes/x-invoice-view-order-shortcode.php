@@ -141,9 +141,9 @@ function x_invoice_view_order_shortcode()
     // Form HTML
     $xi_invoice_view_output .= '
     <div class="xi-invoice-view-form-controls">
-        <div class="go-back-btn">
-            <a href="' . get_site_url() . '/' . $regPageSlug . '">ثبت فاکتور جدید</a>
-            <a href="' . get_site_url() . '/' . 'wp-admin/admin.php?page=xi-invoices' . '" target="_blank">فاکتور های من</a>
+        <div class="go-back-btn xi_btn_group">
+            <a class="xi_btn" href="' . get_site_url() . '/' . $regPageSlug . '">ثبت فاکتور جدید</a>
+            <a class="xi_btn" href="' . get_site_url() . '/' . 'wp-admin/admin.php?page=xi-invoices' . '" target="_blank">فاکتور های من</a>
         </div>
         <div class="xi-search-invoice">
             <form id="x-invoice-view" class="x-invoice-view" action="" method="post">
@@ -153,12 +153,12 @@ function x_invoice_view_order_shortcode()
                 </div>
             </form>
         </div>
-        <div class="xi-print-invoice">
-            <a class="xi-invoice-print" onClick="window.print()">چاپ فاکتور</a>
-            <a href="#" class="xi-invoice-save-pdf" data-invoice-id="' . $invoice_number . '">ذخیره pdf در سایت</a>
+        <div class="xi-print-invoice xi_btn_group">
+            <a class="xi-invoice-print xi_btn" onClick="window.print()">چاپ فاکتور</a>
+            <a href="#" class="xi-invoice-save-pdf xi_btn" data-invoice-id="' . $invoice_number . '">ذخیره pdf در سایت</a>
         </div>
         <input class="xi-pdf-url" readonly type="text" value="' . $invoice->invoice_pdf_link . '" placeholder="برای دریافت لینک، ابتدا pdf را تولید کنید.">
-    </div>';
+        </div>';
     $xi_invoice_view_output .= ob_get_clean();
 
     return $xi_invoice_view_output;
